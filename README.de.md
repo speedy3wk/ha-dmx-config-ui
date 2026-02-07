@@ -30,16 +30,16 @@ Karten‑Konfiguration:
 type: ha-artnet-led-uiconfig
 ```
 
-## Automatisches Schreiben (Add‑on, optional)
-Dieses Repository enthält ein Add‑on unter addons/ha_artnet_led_uiconfig. Das Add‑on schreibt YAML nach /config und triggert einen Reload.
+## Automatisches Schreiben (App, optional)
+Dieses Repository enthält ein App unter addons/ha_artnet_led_uiconfig. Das App schreibt YAML nach /config und triggert einen Reload.
 
 Schritte:
-1. Add‑on Store → ⋮ → Repositories → https://github.com/speedy3wk/ha-artnet-led-uiconfig hinzufügen.
-2. Add‑on installieren.
-3. Add‑on starten.
+1. App Store → ⋮ → Repositories → https://github.com/speedy3wk/ha-artnet-led-uiconfig hinzufügen.
+2. App installieren.
+3. App starten.
 4. Im Panel **Deploy** klicken.
 
-### Add‑on Standard (HAOS / Supervisor)
+### App Standard (HAOS / Supervisor)
 Keine Konfiguration nötig:
 - `ha_url`: http://supervisor/core/api
 - `ha_token`: leer (Supervisor‑Token wird automatisch bereitgestellt)
@@ -57,7 +57,7 @@ Deploy schreibt `/config/ha_artnet_led_uiconfig.yaml` und ergänzt configuration
 ## Installations‑Checkliste
 - Integration installiert und Home Assistant neu gestartet
 - Integration in Einstellungen → Geräte & Dienste hinzugefügt
-- Add‑on installiert und gestartet (optional)
+- App installiert und gestartet (optional)
 - Panel sichtbar: **Art-Net LED Config** in der Sidebar
 
 ## Deploy‑Test

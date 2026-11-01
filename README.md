@@ -22,6 +22,12 @@ Deutsch: siehe [README.de.md](README.de.md).
 - [ha-artnet-led](https://github.com/Breina/ha-artnet-led) 0.x or 1.x beta installed (the editor can also prepare a configuration before the target backend is installed)
 
 ## Installation (HACS custom repository)
+DMX Config UI is not yet included in the HACS default repository list. With HACS already installed, use this button to open the repository in HACS and confirm adding it:
+
+[![Open in HACS](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=speedy3wk&repository=ha-dmx-config-ui&category=integration)
+
+Alternatively, add it manually:
+
 1. In HACS, open ⋮ → **Custom repositories**.
 2. Add `https://github.com/speedy3wk/ha-dmx-config-ui` with the category **Integration**.
 3. Install **DMX Config UI** and restart Home Assistant.

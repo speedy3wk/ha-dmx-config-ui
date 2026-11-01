@@ -3,7 +3,7 @@
     "step": {
       "user": {
         "title": "Art-Net LED UI Config",
-        "description": "Adds the **Art-Net LED Config** panel to the sidebar. The panel writes a YAML file for [ha-artnet-led](https://github.com/Breina/ha-artnet-led)."
+        "description": "Adds the **Art-Net LED Config** panel to the sidebar. The panel writes a YAML file for [ha-artnet-led]({artnet_led_url})."
       }
     },
     "abort": {

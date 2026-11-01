@@ -31,3 +31,4 @@ ISSUE_INCLUDE_MISSING: Final = "include_missing"
 
 STORE_KEY: Final = f"{DOMAIN}.config"
 STORE_VERSION: Final = 2
+ARTNET_LED_URL: Final = "https://github.com/Breina/ha-artnet-led"

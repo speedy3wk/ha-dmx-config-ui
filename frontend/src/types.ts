@@ -54,6 +54,8 @@ export interface ValidationIssue {
   code: string;
   message: string;
   params?: Record<string, string | number>;
+  /** dmx issues may be warnings; everything else is an error. */
+  severity?: "error" | "warning";
 }
 
 export interface PreviewResult {
@@ -72,6 +74,9 @@ export interface DeployResult {
   check_error?: string | null;
   restart_required?: boolean;
   errors?: ValidationIssue[];
+  /** dmx only */
+  warnings?: ValidationIssue[];
+  installed_fixtures?: string[];
 }
 
 export interface StatusResult {
@@ -82,7 +87,24 @@ export interface StatusResult {
   included: boolean;
   restart_required: boolean;
   artnet_led_installed: boolean;
+  backends?: Record<Target, BackendInfo>;
+  dmx?: DmxStatus;
 }
+
+export interface BackendInfo {
+  installed: boolean;
+  loaded: boolean;
+  version: string | null;
+}
+
+export interface DmxStatus {
+  path: string;
+  file_exists: boolean;
+  included: boolean;
+  foreign_block: boolean;
+}
+
+export type Target = "artnet_led" | "dmx";
 
 /** Minimal subset of the Home Assistant frontend object we rely on. */
 export interface HomeAssistant {

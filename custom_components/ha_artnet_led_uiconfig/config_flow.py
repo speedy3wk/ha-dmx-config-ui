@@ -1,4 +1,4 @@
-"""Config and options flow for Art-Net LED UI Config."""
+"""Config and options flow for DMX Config UI."""
 
 from __future__ import annotations
 
@@ -29,7 +29,7 @@ class HaArtnetLedUiConfigFlow(ConfigFlow, domain=DOMAIN):
                 data_schema=vol.Schema({}),
                 description_placeholders={"artnet_led_url": ARTNET_LED_URL},
             )
-        return self.async_create_entry(title="Art-Net LED UI Config", data={})
+        return self.async_create_entry(title="DMX Config UI", data={})
 
     @staticmethod
     @callback

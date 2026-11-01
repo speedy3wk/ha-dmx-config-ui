@@ -62,7 +62,7 @@ def sample_config() -> dict:
 @pytest.fixture
 async def setup_integration(hass: HomeAssistant) -> MockConfigEntry:
     assert await async_setup_component(hass, "http", {})
-    entry = MockConfigEntry(domain=DOMAIN, title="Art-Net LED UI Config", data={})
+    entry = MockConfigEntry(domain=DOMAIN, title="DMX Config UI", data={})
     entry.add_to_hass(hass)
     assert await hass.config_entries.async_setup(entry.entry_id)
     await hass.async_block_till_done()

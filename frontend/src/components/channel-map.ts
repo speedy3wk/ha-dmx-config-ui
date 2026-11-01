@@ -1,7 +1,7 @@
 import { LitElement, css, html } from "lit";
 import { property } from "lit/decorators.js";
 import type { Translate } from "../i18n";
-import { DMX_CHANNELS, channelOccupancy } from "../model";
+import { DMX_CHANNELS, channelOccupancy, type Occupant } from "../model";
 import type { UniverseConfig } from "../types";
 import { safeDefine } from "../utils/define";
 
@@ -9,11 +9,14 @@ export const deviceColor = (index: number) => `hsl(${(index * 137.508) % 360} 65
 
 /** 512-slot overview of a universe. Fires `device-click` with {index}. */
 export class AluChannelMap extends LitElement {
-  @property({ attribute: false }) public universe!: UniverseConfig;
+  @property({ attribute: false }) public universe?: UniverseConfig;
+  /** Precomputed occupancy (used by the dmx editor); wins over `universe`. */
+  @property({ attribute: false }) public occupancy?: Map<number, Occupant[]>;
   @property({ attribute: false }) public t!: Translate;
 
   protected render() {
-    const occupancy = channelOccupancy(this.universe);
+    const occupancy =
+      this.occupancy ?? (this.universe ? channelOccupancy(this.universe) : new Map<number, Occupant[]>());
     const cells = [];
     for (let slot = 1; slot <= DMX_CHANNELS; slot++) {
       const owners = occupancy.get(slot) ?? [];

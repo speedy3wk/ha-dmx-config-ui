@@ -12,20 +12,36 @@ from homeassistant.exceptions import HomeAssistantError
 import voluptuous as vol
 
 from .const import (
+    TARGET_ARTNET,
+    TARGET_DMX,
     WS_DEPLOY,
+    WS_FIXTURE_UPLOAD,
+    WS_FIXTURES,
     WS_GET,
     WS_IMPORT_EXISTING,
+    WS_MIGRATE,
+    WS_OFL_DOWNLOAD,
+    WS_OFL_SEARCH,
     WS_PREVIEW,
     WS_SAVE,
     WS_STATUS,
 )
 from .manager import UiConfigManager, async_get_manager
+from .manager_dmx import DmxManager
 from .model import ConfigFormatError
 
 type _Handler = Callable[
     [HomeAssistant, websocket_api.ActiveConnection, dict[str, Any], UiConfigManager],
     Awaitable[None],
 ]
+
+
+TARGET = vol.Optional("target", default=TARGET_ARTNET)
+TARGETS = vol.In([TARGET_ARTNET, TARGET_DMX])
+
+
+def _target(manager: UiConfigManager, msg: dict[str, Any]) -> UiConfigManager | DmxManager:
+    return manager.dmx if msg.get("target") == TARGET_DMX else manager
 
 
 def _with_manager(
@@ -49,37 +65,43 @@ def _with_manager(
     return wrapper
 
 
-@websocket_api.websocket_command({vol.Required("type"): WS_GET})
+@websocket_api.websocket_command({vol.Required("type"): WS_GET, TARGET: TARGETS})
 @websocket_api.require_admin
 @websocket_api.async_response
 @_with_manager
 async def ws_get(hass, connection, msg, manager: UiConfigManager) -> None:
-    connection.send_result(msg["id"], await manager.async_get_config())
+    connection.send_result(msg["id"], await _target(manager, msg).async_get_config())
 
 
-@websocket_api.websocket_command({vol.Required("type"): WS_SAVE, vol.Required("config"): dict})
+@websocket_api.websocket_command(
+    {vol.Required("type"): WS_SAVE, TARGET: TARGETS, vol.Required("config"): dict}
+)
 @websocket_api.require_admin
 @websocket_api.async_response
 @_with_manager
 async def ws_save(hass, connection, msg, manager: UiConfigManager) -> None:
-    config = await manager.async_save_config(msg["config"])
+    config = await _target(manager, msg).async_save_config(msg["config"])
     connection.send_result(msg["id"], {"status": "ok", "config": config})
 
 
-@websocket_api.websocket_command({vol.Required("type"): WS_PREVIEW, vol.Optional("config"): dict})
+@websocket_api.websocket_command(
+    {vol.Required("type"): WS_PREVIEW, TARGET: TARGETS, vol.Optional("config"): dict}
+)
 @websocket_api.require_admin
 @websocket_api.async_response
 @_with_manager
 async def ws_preview(hass, connection, msg, manager: UiConfigManager) -> None:
-    connection.send_result(msg["id"], await manager.async_preview(msg.get("config")))
+    connection.send_result(msg["id"], await _target(manager, msg).async_preview(msg.get("config")))
 
 
-@websocket_api.websocket_command({vol.Required("type"): WS_DEPLOY, vol.Optional("config"): dict})
+@websocket_api.websocket_command(
+    {vol.Required("type"): WS_DEPLOY, TARGET: TARGETS, vol.Optional("config"): dict}
+)
 @websocket_api.require_admin
 @websocket_api.async_response
 @_with_manager
 async def ws_deploy(hass, connection, msg, manager: UiConfigManager) -> None:
-    connection.send_result(msg["id"], await manager.async_deploy(msg.get("config")))
+    connection.send_result(msg["id"], await _target(manager, msg).async_deploy(msg.get("config")))
 
 
 @websocket_api.websocket_command({vol.Required("type"): WS_STATUS})
@@ -90,15 +112,78 @@ async def ws_status(hass, connection, msg, manager: UiConfigManager) -> None:
     connection.send_result(msg["id"], await manager.async_status())
 
 
-@websocket_api.websocket_command({vol.Required("type"): WS_IMPORT_EXISTING})
+@websocket_api.websocket_command({vol.Required("type"): WS_IMPORT_EXISTING, TARGET: TARGETS})
 @websocket_api.require_admin
 @websocket_api.async_response
 @_with_manager
 async def ws_import_existing(hass, connection, msg, manager: UiConfigManager) -> None:
-    connection.send_result(msg["id"], await manager.async_import_existing())
+    connection.send_result(msg["id"], await _target(manager, msg).async_import_existing())
+
+
+@websocket_api.websocket_command({vol.Required("type"): WS_FIXTURES, vol.Optional("config"): dict})
+@websocket_api.require_admin
+@websocket_api.async_response
+@_with_manager
+async def ws_fixtures(hass, connection, msg, manager: UiConfigManager) -> None:
+    connection.send_result(msg["id"], await manager.dmx.async_fixtures(msg.get("config")))
+
+
+@websocket_api.websocket_command(
+    {
+        vol.Required("type"): WS_FIXTURE_UPLOAD,
+        vol.Required("file_name"): vol.All(str, vol.Length(min=1, max=200)),
+        vol.Required("content"): vol.All(str, vol.Length(min=2, max=2_000_000)),
+    }
+)
+@websocket_api.require_admin
+@websocket_api.async_response
+@_with_manager
+async def ws_fixture_upload(hass, connection, msg, manager: UiConfigManager) -> None:
+    result = await manager.dmx.async_upload_fixture(msg["file_name"], msg["content"])
+    connection.send_result(msg["id"], result)
+
+
+@websocket_api.websocket_command(
+    {vol.Required("type"): WS_OFL_SEARCH, vol.Required("query"): vol.All(str, vol.Length(max=100))}
+)
+@websocket_api.require_admin
+@websocket_api.async_response
+@_with_manager
+async def ws_ofl_search(hass, connection, msg, manager: UiConfigManager) -> None:
+    connection.send_result(msg["id"], await manager.dmx.async_ofl_search(msg["query"]))
+
+
+@websocket_api.websocket_command(
+    {vol.Required("type"): WS_OFL_DOWNLOAD, vol.Required("key"): vol.All(str, vol.Length(max=200))}
+)
+@websocket_api.require_admin
+@websocket_api.async_response
+@_with_manager
+async def ws_ofl_download(hass, connection, msg, manager: UiConfigManager) -> None:
+    connection.send_result(msg["id"], await manager.dmx.async_ofl_download(msg["key"]))
+
+
+@websocket_api.websocket_command({vol.Required("type"): WS_MIGRATE, vol.Optional("config"): dict})
+@websocket_api.require_admin
+@websocket_api.async_response
+@_with_manager
+async def ws_migrate(hass, connection, msg, manager: UiConfigManager) -> None:
+    connection.send_result(msg["id"], await manager.dmx.async_migrate(msg.get("config")))
 
 
 @callback
 def async_register(hass: HomeAssistant) -> None:
-    for handler in (ws_get, ws_save, ws_preview, ws_deploy, ws_status, ws_import_existing):
+    for handler in (
+        ws_get,
+        ws_save,
+        ws_preview,
+        ws_deploy,
+        ws_status,
+        ws_import_existing,
+        ws_fixtures,
+        ws_fixture_upload,
+        ws_ofl_search,
+        ws_ofl_download,
+        ws_migrate,
+    ):
         websocket_api.async_register_command(hass, handler)

@@ -55,7 +55,7 @@ registry.customCards = registry.customCards ?? [];
 if (!registry.customCards.some((card) => card.type === CARD_TYPE)) {
   registry.customCards.push({
     type: CARD_TYPE,
-    name: "Art-Net LED UI Config",
-    description: "Visual editor for ha-artnet-led lights (admin only)."
+    name: "DMX Config UI",
+    description: "Visual editor for ha-artnet-led Art-Net and DMX configurations (admin only)."
   });
 }

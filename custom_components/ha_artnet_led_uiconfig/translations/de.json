@@ -2,8 +2,8 @@
   "config": {
     "step": {
       "user": {
-        "title": "Art-Net LED UI Config",
-        "description": "Fügt das Panel **Art-Net LED Config** zur Seitenleiste hinzu. Das Panel schreibt eine YAML-Datei für [ha-artnet-led]({artnet_led_url})."
+        "title": "DMX Config UI",
+        "description": "Fügt das Panel **DMX Config** zur Seitenleiste hinzu. Das Panel schreibt die YAML-Konfiguration für [ha-artnet-led]({artnet_led_url}) – sowohl für 0.x (`artnet_led`) als auch für 1.x (`dmx`)."
       }
     },
     "abort": {
@@ -13,7 +13,7 @@
   "options": {
     "step": {
       "init": {
-        "title": "Art-Net LED UI Config",
+        "title": "DMX Config UI",
         "data": {
           "include_file": "Include-Datei"
         },
@@ -28,7 +28,7 @@
   },
   "issues": {
     "restart_required": {
-      "title": "Neustart für Art-Net-LED-Änderungen erforderlich",
+      "title": "Neustart für DMX-Änderungen erforderlich",
       "fix_flow": {
         "step": {
           "confirm": {
@@ -42,12 +42,26 @@
       }
     },
     "include_missing": {
-      "title": "Art-Net-LED-Konfiguration wird nicht eingebunden",
+      "title": "ha-artnet-led-0.x-Konfiguration (artnet_led) wird nicht eingebunden",
       "fix_flow": {
         "step": {
           "confirm": {
             "title": "Generierte Datei einbinden",
             "description": "`{include_file}` wird in der `configuration.yaml` nicht referenziert und daher nicht geladen. Absenden hängt folgende Zeile an:\n\n`{include_line}`"
+          }
+        },
+        "abort": {
+          "not_loaded": "Die Integration ist nicht geladen."
+        }
+      }
+    },
+    "dmx_include_missing": {
+      "title": "ha-artnet-led-1.x-Konfiguration (dmx) wird nicht eingebunden",
+      "fix_flow": {
+        "step": {
+          "confirm": {
+            "title": "Generierte Datei einbinden",
+            "description": "`{include_file}` wird in der `configuration.yaml` nicht referenziert und daher nicht geladen. Absenden setzt den Schlüssel `dmx:` auf:\n\n`{include_line}`\n\nEin bereits vorhandener `dmx:`-Block wird dabei ersetzt; die bisherige `configuration.yaml` wird vorher als `{backup_file}` gesichert („-“ = kein Block vorhanden)."
           }
         },
         "abort": {

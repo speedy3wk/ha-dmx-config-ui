@@ -1,1 +1,1 @@
-"""Tests for Art-Net LED UI Config."""
+"""Tests for DMX Config UI."""

@@ -104,6 +104,10 @@ export const sharedStyles = css`
     font-size: 0.75rem;
     color: var(--alu-error);
   }
+  .field .warn {
+    font-size: 0.75rem;
+    color: var(--alu-warning);
+  }
   label.check {
     display: flex;
     align-items: center;
@@ -174,7 +178,14 @@ const GLYPHS: Record<string, string> = {
   "mdi:redo": "↷",
   "mdi:dots-vertical": "⋮",
   "mdi:close": "✕",
-  "mdi:drag": "⋮⋮"
+  "mdi:drag": "⋮⋮",
+  "mdi:magnify": "⌕",
+  "mdi:download": "↓",
+  "mdi:upload": "↑",
+  "mdi:bookshelf": "▤",
+  "mdi:swap-horizontal": "⇄",
+  "mdi:spotlight-beam": "◮",
+  "mdi:lightbulb": "●"
 };
 
 export const icon = (name: string) =>
@@ -192,6 +203,8 @@ export const alert = (type: AlertType, content: unknown) =>
 interface BaseField {
   label: string;
   errors?: string[];
+  /** Non-blocking hints, shown in the warning colour. */
+  warnings?: string[];
   helper?: string | TemplateResult;
   placeholder?: string;
   required?: boolean;
@@ -203,9 +216,11 @@ const wrap = (opts: BaseField, control: TemplateResult) => html`
     ${control}
     ${opts.errors?.length
       ? opts.errors.map((error) => html`<span class="error">${error}</span>`)
-      : opts.helper
-        ? html`<span class="helper">${opts.helper}</span>`
-        : nothing}
+      : opts.warnings?.length
+        ? opts.warnings.map((warning) => html`<span class="warn">${warning}</span>`)
+        : opts.helper
+          ? html`<span class="helper">${opts.helper}</span>`
+          : nothing}
   </label>
 `;
 

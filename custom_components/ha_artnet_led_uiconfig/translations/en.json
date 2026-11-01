@@ -2,8 +2,8 @@
   "config": {
     "step": {
       "user": {
-        "title": "Art-Net LED UI Config",
-        "description": "Adds the **Art-Net LED Config** panel to the sidebar. The panel writes a YAML file for [ha-artnet-led]({artnet_led_url})."
+        "title": "DMX Config UI",
+        "description": "Adds the **DMX Config** panel to the sidebar. The panel writes the YAML configuration for [ha-artnet-led]({artnet_led_url}) – both 0.x (`artnet_led`) and 1.x (`dmx`)."
       }
     },
     "abort": {
@@ -13,7 +13,7 @@
   "options": {
     "step": {
       "init": {
-        "title": "Art-Net LED UI Config",
+        "title": "DMX Config UI",
         "data": {
           "include_file": "Include file"
         },
@@ -28,7 +28,7 @@
   },
   "issues": {
     "restart_required": {
-      "title": "Restart required for Art-Net LED changes",
+      "title": "Restart required for DMX changes",
       "fix_flow": {
         "step": {
           "confirm": {
@@ -42,12 +42,26 @@
       }
     },
     "include_missing": {
-      "title": "Art-Net LED configuration is not included",
+      "title": "ha-artnet-led 0.x (artnet_led) configuration is not included",
       "fix_flow": {
         "step": {
           "confirm": {
             "title": "Include the generated file",
             "description": "`{include_file}` is not referenced in `configuration.yaml`, so Home Assistant will not load it. Submit to append the following line:\n\n`{include_line}`"
+          }
+        },
+        "abort": {
+          "not_loaded": "The integration is not loaded."
+        }
+      }
+    },
+    "dmx_include_missing": {
+      "title": "ha-artnet-led 1.x (dmx) configuration is not included",
+      "fix_flow": {
+        "step": {
+          "confirm": {
+            "title": "Include the generated file",
+            "description": "`{include_file}` is not referenced in `configuration.yaml`, so Home Assistant will not load it. Submit to set the `dmx:` key to:\n\n`{include_line}`\n\nAn existing `dmx:` block is replaced; the previous `configuration.yaml` is saved as `{backup_file}` first (\"-\" = no block present)."
           }
         },
         "abort": {

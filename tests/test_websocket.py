@@ -152,7 +152,7 @@ async def test_deploy_with_include(
     status = (await client.receive_json())["result"]
     assert status["included"] and status["file_exists"] and status["restart_required"]
     assert status["artnet_led_installed"] is False
-    assert status["version"] == "0.2.0"
+    assert status["version"] == "0.3.0"
 
 
 async def test_deploy_reports_check_error(
@@ -224,7 +224,7 @@ async def test_include_fix_flow(
 
 
 async def test_restart_fix_flow(hass: HomeAssistant, setup_integration, hass_client) -> None:
-    setup_integration.runtime_data._create_restart_issue()
+    setup_integration.runtime_data.create_restart_issue()
     restart = async_mock_service(hass, "homeassistant", "restart")
     with patch(CHECK, AsyncMock(return_value=None)):
         result = await _run_fix(hass, hass_client, ISSUE_RESTART_REQUIRED)
@@ -236,7 +236,7 @@ async def test_restart_fix_flow(hass: HomeAssistant, setup_integration, hass_cli
 async def test_restart_fix_flow_invalid_config(
     hass: HomeAssistant, setup_integration, hass_client
 ) -> None:
-    setup_integration.runtime_data._create_restart_issue()
+    setup_integration.runtime_data.create_restart_issue()
     restart = async_mock_service(hass, "homeassistant", "restart")
     with patch(CHECK, AsyncMock(return_value="broken")):
         result = await _run_fix(hass, hass_client, ISSUE_RESTART_REQUIRED)

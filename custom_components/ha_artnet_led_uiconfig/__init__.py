@@ -1,4 +1,4 @@
-"""Art-Net LED UI Config: a WYSIWYG editor for ha-artnet-led."""
+"""DMX Config UI: a WYSIWYG editor for ha-artnet-led (artnet_led 0.x and dmx 1.x)."""
 
 from __future__ import annotations
 

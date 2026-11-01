@@ -1,0 +1,688 @@
+[
+  {
+    "name": "valid example",
+    "config": {
+      "fixtures_folder": "fixtures",
+      "max_fps": 30,
+      "artnet": {
+        "refresh_every": 0.8,
+        "universes": [
+          {
+            "net": 0,
+            "subnet": 0,
+            "universe": 1,
+            "manual_nodes": [
+              {
+                "host": "10.0.0.2"
+              }
+            ],
+            "devices": [
+              {
+                "name": "Strip",
+                "start_address": 1,
+                "fixture": "RGB",
+                "mode": "16bit"
+              },
+              {
+                "name": "Spot",
+                "start_address": 7,
+                "fixture": "desk-channel",
+                "entity_id_prefix": "spot",
+                "output_correction": {
+                  "curve": "quadratic",
+                  "min": 0.05,
+                  "max": 0.9
+                }
+              }
+            ]
+          },
+          {
+            "net": 1,
+            "subnet": 2,
+            "universe": 1,
+            "devices": []
+          }
+        ]
+      },
+      "sacn": {
+        "priority": 150,
+        "universes": [
+          {
+            "universe": 1,
+            "unicast_addresses": [
+              {
+                "host": "10.0.0.3",
+                "port": 5568
+              }
+            ],
+            "devices": [
+              {
+                "name": "Desk",
+                "start_address": 511,
+                "fixture": "DeskCh"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "fixtures": [
+      {
+        "aliases": [
+          "RGB",
+          "rgb-fader",
+          "RGB Fader"
+        ],
+        "modes": [
+          {
+            "key": "8bit",
+            "name": "8 bit",
+            "width": 3,
+            "exact": true
+          },
+          {
+            "key": "16bit",
+            "name": "16 bit",
+            "width": 6,
+            "exact": true
+          }
+        ]
+      },
+      {
+        "aliases": [
+          "DeskCh",
+          "desk-channel",
+          "Desk Channel"
+        ],
+        "modes": [
+          {
+            "key": "8bit",
+            "name": "8 bit",
+            "width": 1,
+            "exact": true
+          }
+        ]
+      },
+      {
+        "aliases": [
+          "Pixel Bar"
+        ],
+        "modes": [
+          {
+            "key": "Pixels",
+            "name": "Pixels",
+            "width": 30,
+            "exact": false
+          }
+        ]
+      }
+    ],
+    "expected": []
+  },
+  {
+    "name": "required fields and ranges",
+    "config": {
+      "fixtures_folder": "../outside",
+      "max_fps": 50,
+      "artnet": {
+        "refresh_every": -1,
+        "universes": [
+          {
+            "net": 16,
+            "subnet": 0,
+            "universe": 1,
+            "manual_nodes": [
+              {
+                "host": "",
+                "port": 70000
+              }
+            ],
+            "devices": [
+              {
+                "name": "",
+                "start_address": 0,
+                "fixture": ""
+              },
+              {
+                "name": "x",
+                "start_address": 1,
+                "fixture": "RGB",
+                "entity_id_prefix": "Bad Prefix",
+                "output_correction": {
+                  "curve": "log",
+                  "min": 0.8,
+                  "max": 0.2
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "sacn": {
+        "priority": 300,
+        "multicast_ttl": 0,
+        "sync_address": 70000,
+        "source_name": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "universes": [
+          {
+            "universe": 0,
+            "devices": []
+          }
+        ]
+      }
+    },
+    "fixtures": [
+      {
+        "aliases": [
+          "RGB",
+          "rgb-fader",
+          "RGB Fader"
+        ],
+        "modes": [
+          {
+            "key": "8bit",
+            "name": "8 bit",
+            "width": 3,
+            "exact": true
+          },
+          {
+            "key": "16bit",
+            "name": "16 bit",
+            "width": 6,
+            "exact": true
+          }
+        ]
+      },
+      {
+        "aliases": [
+          "DeskCh",
+          "desk-channel",
+          "Desk Channel"
+        ],
+        "modes": [
+          {
+            "key": "8bit",
+            "name": "8 bit",
+            "width": 1,
+            "exact": true
+          }
+        ]
+      },
+      {
+        "aliases": [
+          "Pixel Bar"
+        ],
+        "modes": [
+          {
+            "key": "Pixels",
+            "name": "Pixels",
+            "width": 30,
+            "exact": false
+          }
+        ]
+      }
+    ],
+    "expected": [
+      {
+        "path": [
+          "fixtures_folder"
+        ],
+        "code": "folder",
+        "severity": "error"
+      },
+      {
+        "path": [
+          "max_fps"
+        ],
+        "code": "range",
+        "severity": "error"
+      },
+      {
+        "path": [
+          "artnet",
+          "refresh_every"
+        ],
+        "code": "range",
+        "severity": "error"
+      },
+      {
+        "path": [
+          "sacn",
+          "priority"
+        ],
+        "code": "range",
+        "severity": "error"
+      },
+      {
+        "path": [
+          "sacn",
+          "multicast_ttl"
+        ],
+        "code": "range",
+        "severity": "error"
+      },
+      {
+        "path": [
+          "sacn",
+          "sync_address"
+        ],
+        "code": "range",
+        "severity": "error"
+      },
+      {
+        "path": [
+          "sacn",
+          "source_name"
+        ],
+        "code": "length",
+        "severity": "error"
+      },
+      {
+        "path": [
+          "artnet",
+          "universes",
+          0,
+          "net"
+        ],
+        "code": "range",
+        "severity": "error"
+      },
+      {
+        "path": [
+          "artnet",
+          "universes",
+          0,
+          "manual_nodes",
+          0,
+          "host"
+        ],
+        "code": "required",
+        "severity": "error"
+      },
+      {
+        "path": [
+          "artnet",
+          "universes",
+          0,
+          "manual_nodes",
+          0,
+          "port"
+        ],
+        "code": "range",
+        "severity": "error"
+      },
+      {
+        "path": [
+          "artnet",
+          "universes",
+          0,
+          "devices",
+          0,
+          "name"
+        ],
+        "code": "required",
+        "severity": "error"
+      },
+      {
+        "path": [
+          "artnet",
+          "universes",
+          0,
+          "devices",
+          0,
+          "start_address"
+        ],
+        "code": "range",
+        "severity": "error"
+      },
+      {
+        "path": [
+          "artnet",
+          "universes",
+          0,
+          "devices",
+          0,
+          "fixture"
+        ],
+        "code": "required",
+        "severity": "error"
+      },
+      {
+        "path": [
+          "artnet",
+          "universes",
+          0,
+          "devices",
+          1,
+          "entity_id_prefix"
+        ],
+        "code": "prefix",
+        "severity": "error"
+      },
+      {
+        "path": [
+          "artnet",
+          "universes",
+          0,
+          "devices",
+          1,
+          "output_correction",
+          "curve"
+        ],
+        "code": "choice",
+        "severity": "error"
+      },
+      {
+        "path": [
+          "artnet",
+          "universes",
+          0,
+          "devices",
+          1,
+          "output_correction",
+          "min"
+        ],
+        "code": "min_max",
+        "severity": "error"
+      },
+      {
+        "path": [
+          "sacn",
+          "universes",
+          0,
+          "universe"
+        ],
+        "code": "range",
+        "severity": "error"
+      }
+    ]
+  },
+  {
+    "name": "fixture checks",
+    "config": {
+      "artnet": {
+        "universes": [
+          {
+            "universe": 0,
+            "devices": [
+              {
+                "name": "a",
+                "start_address": 1,
+                "fixture": "RGB",
+                "mode": "16 bit"
+              },
+              {
+                "name": "b",
+                "start_address": 510,
+                "fixture": "RGB"
+              },
+              {
+                "name": "c",
+                "start_address": 100,
+                "fixture": "Unknown Thing"
+              },
+              {
+                "name": "d",
+                "start_address": 200,
+                "fixture": "Pixel Bar"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "fixtures": [
+      {
+        "aliases": [
+          "RGB",
+          "rgb-fader",
+          "RGB Fader"
+        ],
+        "modes": [
+          {
+            "key": "8bit",
+            "name": "8 bit",
+            "width": 3,
+            "exact": true
+          },
+          {
+            "key": "16bit",
+            "name": "16 bit",
+            "width": 6,
+            "exact": true
+          }
+        ]
+      },
+      {
+        "aliases": [
+          "DeskCh",
+          "desk-channel",
+          "Desk Channel"
+        ],
+        "modes": [
+          {
+            "key": "8bit",
+            "name": "8 bit",
+            "width": 1,
+            "exact": true
+          }
+        ]
+      },
+      {
+        "aliases": [
+          "Pixel Bar"
+        ],
+        "modes": [
+          {
+            "key": "Pixels",
+            "name": "Pixels",
+            "width": 30,
+            "exact": false
+          }
+        ]
+      }
+    ],
+    "expected": [
+      {
+        "path": [
+          "artnet",
+          "universes",
+          0,
+          "devices",
+          0,
+          "mode"
+        ],
+        "code": "mode_unknown",
+        "severity": "error"
+      },
+      {
+        "path": [
+          "artnet",
+          "universes",
+          0,
+          "devices",
+          2,
+          "fixture"
+        ],
+        "code": "fixture_unknown",
+        "severity": "warning"
+      },
+      {
+        "path": [
+          "artnet",
+          "universes",
+          0,
+          "devices",
+          3,
+          "mode"
+        ],
+        "code": "width_estimated",
+        "severity": "warning"
+      }
+    ]
+  },
+  {
+    "name": "overlap and duplicates",
+    "config": {
+      "artnet": {
+        "universes": [
+          {
+            "universe": 1,
+            "devices": [
+              {
+                "name": "a",
+                "start_address": 1,
+                "fixture": "RGB",
+                "entity_id_prefix": "p"
+              },
+              {
+                "name": "b",
+                "start_address": 3,
+                "fixture": "DeskCh",
+                "entity_id_prefix": "p"
+              },
+              {
+                "name": "a",
+                "start_address": 10,
+                "fixture": "DeskCh"
+              }
+            ]
+          },
+          {
+            "net": 0,
+            "subnet": 0,
+            "universe": 1,
+            "devices": []
+          }
+        ]
+      },
+      "sacn": {
+        "universes": [
+          {
+            "universe": 1,
+            "devices": [
+              {
+                "name": "c",
+                "start_address": 1,
+                "fixture": "RGB"
+              }
+            ]
+          },
+          {
+            "universe": 1,
+            "devices": []
+          }
+        ]
+      }
+    },
+    "fixtures": [
+      {
+        "aliases": [
+          "RGB",
+          "rgb-fader",
+          "RGB Fader"
+        ],
+        "modes": [
+          {
+            "key": "8bit",
+            "name": "8 bit",
+            "width": 3,
+            "exact": true
+          },
+          {
+            "key": "16bit",
+            "name": "16 bit",
+            "width": 6,
+            "exact": true
+          }
+        ]
+      },
+      {
+        "aliases": [
+          "DeskCh",
+          "desk-channel",
+          "Desk Channel"
+        ],
+        "modes": [
+          {
+            "key": "8bit",
+            "name": "8 bit",
+            "width": 1,
+            "exact": true
+          }
+        ]
+      },
+      {
+        "aliases": [
+          "Pixel Bar"
+        ],
+        "modes": [
+          {
+            "key": "Pixels",
+            "name": "Pixels",
+            "width": 30,
+            "exact": false
+          }
+        ]
+      }
+    ],
+    "expected": [
+      {
+        "path": [
+          "artnet",
+          "universes",
+          0,
+          "devices",
+          1,
+          "entity_id_prefix"
+        ],
+        "code": "duplicate",
+        "severity": "error"
+      },
+      {
+        "path": [
+          "artnet",
+          "universes",
+          0,
+          "devices",
+          1,
+          "start_address"
+        ],
+        "code": "overlap",
+        "severity": "error"
+      },
+      {
+        "path": [
+          "artnet",
+          "universes",
+          0,
+          "devices",
+          2,
+          "name"
+        ],
+        "code": "duplicate",
+        "severity": "error"
+      },
+      {
+        "path": [
+          "artnet",
+          "universes",
+          1,
+          "universe"
+        ],
+        "code": "duplicate",
+        "severity": "error"
+      },
+      {
+        "path": [
+          "sacn",
+          "universes",
+          1,
+          "universe"
+        ],
+        "code": "duplicate",
+        "severity": "error"
+      }
+    ]
+  }
+]

@@ -1,8 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Frontend
 **/node_modules/
 **/dist/
 !custom_components/ha_artnet_led_uiconfig/frontend/dist/
-custom_components/ha_artnet_led_uiconfig/frontend/dist/*.map
+*.map
+coverage/
+
+# Release artifacts
+*.zip
+
+# Local Home Assistant / secrets
 .storage/
-.DS_Store
+.env
+secrets.yaml
+
+# Editors / OS
 .vscode/
-.github/
+.idea/
+*.swp
+.DS_Store
+*.log

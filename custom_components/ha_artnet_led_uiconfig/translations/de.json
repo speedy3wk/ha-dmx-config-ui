@@ -1,0 +1,59 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Art-Net LED UI Config",
+        "description": "Fügt das Panel **Art-Net LED Config** zur Seitenleiste hinzu. Das Panel schreibt eine YAML-Datei für [ha-artnet-led](https://github.com/Breina/ha-artnet-led)."
+      }
+    },
+    "abort": {
+      "single_instance_allowed": "Bereits konfiguriert. Nur eine einzige Konfiguration möglich."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Art-Net LED UI Config",
+        "data": {
+          "include_file": "Include-Datei"
+        },
+        "data_description": {
+          "include_file": "Datei im Konfigurationsverzeichnis, in die die generierten `artnet_led`-Plattformen geschrieben werden, z. B. `ha_artnet_led_uiconfig.yaml`."
+        }
+      }
+    },
+    "error": {
+      "invalid_include_file": "Relativen Pfad mit Endung .yaml oder .yml innerhalb des Konfigurationsverzeichnisses angeben (nicht configuration.yaml)."
+    }
+  },
+  "issues": {
+    "restart_required": {
+      "title": "Neustart für Art-Net-LED-Änderungen erforderlich",
+      "fix_flow": {
+        "step": {
+          "confirm": {
+            "title": "Home Assistant neu starten",
+            "description": "`{include_file}` wurde aktualisiert. ha-artnet-led liest seine Konfiguration nur beim Start, daher muss Home Assistant neu gestartet werden. Die Konfiguration wird vor dem Neustart geprüft."
+          }
+        },
+        "abort": {
+          "config_invalid": "Die Konfiguration ist ungültig, Neustart abgebrochen:\n\n{error}"
+        }
+      }
+    },
+    "include_missing": {
+      "title": "Art-Net-LED-Konfiguration wird nicht eingebunden",
+      "fix_flow": {
+        "step": {
+          "confirm": {
+            "title": "Generierte Datei einbinden",
+            "description": "`{include_file}` wird in der `configuration.yaml` nicht referenziert und daher nicht geladen. Absenden hängt folgende Zeile an:\n\n`{include_line}`"
+          }
+        },
+        "abort": {
+          "not_loaded": "Die Integration ist nicht geladen."
+        }
+      }
+    }
+  }
+}

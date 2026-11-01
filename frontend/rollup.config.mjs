@@ -1,7 +1,11 @@
-import resolve from "@rollup/plugin-node-resolve";
+import { readFileSync } from "node:fs";
 import commonjs from "@rollup/plugin-commonjs";
-import typescript from "@rollup/plugin-typescript";
+import resolve from "@rollup/plugin-node-resolve";
+import replace from "@rollup/plugin-replace";
 import terser from "@rollup/plugin-terser";
+import typescript from "@rollup/plugin-typescript";
+
+const { version } = JSON.parse(readFileSync(new URL("./package.json", import.meta.url), "utf8"));
 
 export default {
   input: "src/index.ts",
@@ -11,13 +15,10 @@ export default {
     sourcemap: true
   },
   plugins: [
-    resolve({
-      browser: true
-    }),
+    replace({ preventAssignment: true, values: { __VERSION__: JSON.stringify(version) } }),
+    resolve({ browser: true }),
     commonjs(),
-    typescript({
-      tsconfig: "./tsconfig.json"
-    }),
-    terser()
+    typescript({ tsconfig: "./tsconfig.json" }),
+    terser({ format: { comments: false } })
   ]
 };

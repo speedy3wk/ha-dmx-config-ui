@@ -1,58 +1,61 @@
 import { LitElement, css, html } from "lit";
 import { property } from "lit/decorators.js";
 import "./panel";
+import type { HomeAssistant } from "./types";
+import { safeDefine } from "./utils/define";
 
-const safeDefine = (tag: string, ctor: CustomElementConstructor) => {
-  if (customElements.get(tag)) {
-    return;
-  }
-  try {
-    customElements.define(tag, ctor);
-  } catch {
-    return;
-  }
-};
+const CARD_TYPE = "ha-artnet-led-uiconfig";
 
-export class HaArtnetLedUiConfigCard extends LitElement {
-  @property({ attribute: false }) public hass?: any;
-  @property({ attribute: false }) public config?: Record<string, unknown>;
+/** Dashboard card embedding the editor (`type: custom:ha-artnet-led-uiconfig`). */
+export class ArtnetLedUiConfigCard extends LitElement {
+  @property({ attribute: false }) public hass?: HomeAssistant;
 
-  public setConfig(config: Record<string, unknown>) {
-    this.config = config;
+  public setConfig(_config: Record<string, unknown>) {
+    // The card has no options; the configuration lives in the integration.
   }
 
   public getCardSize() {
-    return 6;
+    return 12;
+  }
+
+  public getGridOptions() {
+    return { columns: "full", min_columns: 6 };
+  }
+
+  public static getStubConfig() {
+    return {};
   }
 
   protected render() {
-    return html`
-      <ha-card class="card">
-        <ha-artnet-led-uiconfig-panel .hass=${this.hass}></ha-artnet-led-uiconfig-panel>
-      </ha-card>
-    `;
+    return html`<ha-card>
+      <ha-artnet-led-uiconfig-panel embedded .hass=${this.hass}></ha-artnet-led-uiconfig-panel>
+    </ha-card>`;
   }
 
   static styles = css`
     :host {
       display: block;
     }
-
-    .card {
+    ha-card {
       overflow: hidden;
-    }
-
-    ha-artnet-led-uiconfig-panel {
-      display: block;
     }
   `;
 }
 
-safeDefine("ha-artnet-led-uiconfig", HaArtnetLedUiConfigCard);
+safeDefine(CARD_TYPE, ArtnetLedUiConfigCard);
 
-(window as any).customCards = (window as any).customCards || [];
-(window as any).customCards.push({
-  type: "ha-artnet-led-uiconfig",
-  name: "Art-Net LED UI Config",
-  description: "WYSIWYG editor for ha-artnet-led inside a Lovelace card."
-});
+interface CustomCardEntry {
+  type: string;
+  name: string;
+  description: string;
+}
+
+const registry = window as unknown as { customCards?: CustomCardEntry[] };
+registry.customCards = registry.customCards ?? [];
+if (!registry.customCards.some((card) => card.type === CARD_TYPE)) {
+  registry.customCards.push({
+    type: CARD_TYPE,
+    name: "Art-Net LED UI Config",
+    description: "Visual editor for ha-artnet-led lights (admin only)."
+  });
+}

@@ -1,0 +1,59 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Art-Net LED UI Config",
+        "description": "Adds the **Art-Net LED Config** panel to the sidebar. The panel writes a YAML file for [ha-artnet-led](https://github.com/Breina/ha-artnet-led)."
+      }
+    },
+    "abort": {
+      "single_instance_allowed": "[%key:common::config_flow::abort::single_instance_allowed%]"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Art-Net LED UI Config",
+        "data": {
+          "include_file": "Include file"
+        },
+        "data_description": {
+          "include_file": "File in the configuration directory that receives the generated `artnet_led` platforms, e.g. `ha_artnet_led_uiconfig.yaml`."
+        }
+      }
+    },
+    "error": {
+      "invalid_include_file": "Use a relative path ending with .yaml or .yml inside the configuration directory (not configuration.yaml)."
+    }
+  },
+  "issues": {
+    "restart_required": {
+      "title": "Restart required for Art-Net LED changes",
+      "fix_flow": {
+        "step": {
+          "confirm": {
+            "title": "Restart Home Assistant",
+            "description": "`{include_file}` was updated. ha-artnet-led only reads its configuration at startup, so Home Assistant needs to be restarted. The configuration is checked before restarting."
+          }
+        },
+        "abort": {
+          "config_invalid": "The configuration is invalid, restart aborted:\n\n{error}"
+        }
+      }
+    },
+    "include_missing": {
+      "title": "Art-Net LED configuration is not included",
+      "fix_flow": {
+        "step": {
+          "confirm": {
+            "title": "Include the generated file",
+            "description": "`{include_file}` is not referenced in `configuration.yaml`, so Home Assistant will not load it. Submit to append the following line:\n\n`{include_line}`"
+          }
+        },
+        "abort": {
+          "not_loaded": "The integration is not loaded."
+        }
+      }
+    }
+  }
+}

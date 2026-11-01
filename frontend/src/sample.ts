@@ -1,8 +1,7 @@
-import { ArtnetLedCardConfig } from "./types";
+import type { UiConfig } from "./types";
 
-export const EXAMPLE_CONFIG: ArtnetLedCardConfig = {
-  type: "ha_artnet_led_uiconfig",
-  title: "Artnet LED Example",
+export const exampleConfig = (): UiConfig => ({
+  title: "",
   nodes: [
     {
       host: "192.168.0.10",
@@ -15,14 +14,7 @@ export const EXAMPLE_CONFIG: ArtnetLedCardConfig = {
           send_partial_universe: true,
           output_correction: "quadratic",
           devices: [
-            {
-              channel: 1,
-              name: "my_dimmer",
-              type: "dimmer",
-              transition: 1,
-              output_correction: "quadratic",
-              channel_size: "16bit"
-            },
+            { channel: 1, name: "my_dimmer", type: "dimmer", transition: 1, channel_size: "16bit" },
             {
               channel: 3,
               name: "my_rgb_lamp",
@@ -40,21 +32,11 @@ export const EXAMPLE_CONFIG: ArtnetLedCardConfig = {
               max_temp: "6500K",
               channel_setup: "ch"
             },
-            {
-              channel: 41,
-              name: "my_rgbww_lamp",
-              type: "rgbww",
-              transition: 10
-            },
-            {
-              channel: 50,
-              name: "sp4led_1_dimmer",
-              type: "fixed",
-              channel_setup: [255]
-            }
+            { channel: 41, name: "my_rgbww_lamp", type: "rgbww", transition: 10 },
+            { channel: 50, name: "sp4led_1_dimmer", type: "fixed", channel_setup: [255] }
           ]
         }
       ]
     }
   ]
-};
+});

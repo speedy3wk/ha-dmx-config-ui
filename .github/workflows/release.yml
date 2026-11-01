@@ -1,0 +1,24 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  zip:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check version matches tag
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          manifest=$(jq -r .version custom_components/ha_artnet_led_uiconfig/manifest.json)
+          test "$tag" = "$manifest" || { echo "Tag $tag != manifest $manifest"; exit 1; }
+      - name: Build zip
+        run: cd custom_components/ha_artnet_led_uiconfig && zip -r ../../ha_artnet_led_uiconfig.zip . -x "__pycache__/*" "*.map"
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: ha_artnet_led_uiconfig.zip

@@ -1,0 +1,577 @@
+[
+  {
+    "name": "valid example",
+    "config": {
+      "title": "",
+      "nodes": [
+        {
+          "host": "10.0.0.1",
+          "universes": [
+            {
+              "id": 0,
+              "devices": [
+                {
+                  "channel": 1,
+                  "name": "dimmer",
+                  "type": "dimmer",
+                  "channel_size": "16bit"
+                },
+                {
+                  "channel": 3,
+                  "name": "rgb",
+                  "type": "rgb",
+                  "channel_size": "16bit",
+                  "channel_setup": "rbgw"
+                },
+                {
+                  "channel": 125,
+                  "name": "ct",
+                  "type": "color_temp",
+                  "min_temp": "2500K",
+                  "max_temp": "6500K",
+                  "channel_setup": "ch"
+                },
+                {
+                  "channel": 41,
+                  "name": "ww",
+                  "type": "rgbww"
+                },
+                {
+                  "channel": 50,
+                  "name": "fix",
+                  "type": "fixed",
+                  "channel_setup": [
+                    255
+                  ]
+                },
+                {
+                  "channel": 60,
+                  "name": "xy",
+                  "type": "xy"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "expected": []
+  },
+  {
+    "name": "missing host and universes",
+    "config": {
+      "title": "",
+      "nodes": [
+        {
+          "host": "",
+          "universes": []
+        }
+      ]
+    },
+    "expected": [
+      {
+        "path": [
+          "nodes",
+          0,
+          "host"
+        ],
+        "code": "required"
+      },
+      {
+        "path": [
+          "nodes",
+          0,
+          "universes"
+        ],
+        "code": "required"
+      }
+    ]
+  },
+  {
+    "name": "node ranges and choice",
+    "config": {
+      "title": "",
+      "nodes": [
+        {
+          "host": "10.0.0.1",
+          "universes": [
+            {
+              "id": 0,
+              "devices": []
+            }
+          ],
+          "node_type": "dmx",
+          "port": 0,
+          "port_override": 70000,
+          "max_fps": 60,
+          "refresh_every": -1
+        }
+      ]
+    },
+    "expected": [
+      {
+        "path": [
+          "nodes",
+          0,
+          "node_type"
+        ],
+        "code": "choice"
+      },
+      {
+        "path": [
+          "nodes",
+          0,
+          "port"
+        ],
+        "code": "range"
+      },
+      {
+        "path": [
+          "nodes",
+          0,
+          "port_override"
+        ],
+        "code": "range"
+      },
+      {
+        "path": [
+          "nodes",
+          0,
+          "max_fps"
+        ],
+        "code": "range"
+      },
+      {
+        "path": [
+          "nodes",
+          0,
+          "refresh_every"
+        ],
+        "code": "range"
+      }
+    ]
+  },
+  {
+    "name": "duplicate universe ids",
+    "config": {
+      "title": "",
+      "nodes": [
+        {
+          "host": "h",
+          "universes": [
+            {
+              "id": 1,
+              "devices": []
+            },
+            {
+              "id": 1,
+              "devices": []
+            },
+            {
+              "id": 2000,
+              "devices": []
+            }
+          ]
+        }
+      ]
+    },
+    "expected": [
+      {
+        "path": [
+          "nodes",
+          0,
+          "universes",
+          1,
+          "id"
+        ],
+        "code": "duplicate"
+      },
+      {
+        "path": [
+          "nodes",
+          0,
+          "universes",
+          2,
+          "id"
+        ],
+        "code": "range"
+      }
+    ]
+  },
+  {
+    "name": "device field errors",
+    "config": {
+      "title": "",
+      "nodes": [
+        {
+          "host": "10.0.0.1",
+          "universes": [
+            {
+              "id": 0,
+              "devices": [
+                {
+                  "channel": 0,
+                  "name": "",
+                  "type": "laser",
+                  "transition": 1000,
+                  "output_correction": "x",
+                  "channel_size": "12bit",
+                  "byte_order": "middle"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "expected": [
+      {
+        "path": [
+          "nodes",
+          0,
+          "universes",
+          0,
+          "devices",
+          0,
+          "name"
+        ],
+        "code": "required"
+      },
+      {
+        "path": [
+          "nodes",
+          0,
+          "universes",
+          0,
+          "devices",
+          0,
+          "type"
+        ],
+        "code": "choice"
+      },
+      {
+        "path": [
+          "nodes",
+          0,
+          "universes",
+          0,
+          "devices",
+          0,
+          "channel"
+        ],
+        "code": "range"
+      },
+      {
+        "path": [
+          "nodes",
+          0,
+          "universes",
+          0,
+          "devices",
+          0,
+          "transition"
+        ],
+        "code": "range"
+      },
+      {
+        "path": [
+          "nodes",
+          0,
+          "universes",
+          0,
+          "devices",
+          0,
+          "output_correction"
+        ],
+        "code": "choice"
+      },
+      {
+        "path": [
+          "nodes",
+          0,
+          "universes",
+          0,
+          "devices",
+          0,
+          "channel_size"
+        ],
+        "code": "choice"
+      },
+      {
+        "path": [
+          "nodes",
+          0,
+          "universes",
+          0,
+          "devices",
+          0,
+          "byte_order"
+        ],
+        "code": "choice"
+      }
+    ]
+  },
+  {
+    "name": "temp format",
+    "config": {
+      "title": "",
+      "nodes": [
+        {
+          "host": "10.0.0.1",
+          "universes": [
+            {
+              "id": 0,
+              "devices": [
+                {
+                  "channel": 1,
+                  "name": "a",
+                  "type": "color_temp",
+                  "min_temp": "2700",
+                  "max_temp": "6500K"
+                },
+                {
+                  "channel": 10,
+                  "name": "b",
+                  "type": "rgb",
+                  "min_temp": "bad"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "expected": [
+      {
+        "path": [
+          "nodes",
+          0,
+          "universes",
+          0,
+          "devices",
+          0,
+          "min_temp"
+        ],
+        "code": "temp"
+      }
+    ]
+  },
+  {
+    "name": "setup chars and values",
+    "config": {
+      "title": "",
+      "nodes": [
+        {
+          "host": "10.0.0.1",
+          "universes": [
+            {
+              "id": 0,
+              "devices": [
+                {
+                  "channel": 1,
+                  "name": "a",
+                  "type": "rgb",
+                  "channel_setup": "rgbx"
+                },
+                {
+                  "channel": 10,
+                  "name": "b",
+                  "type": "fixed",
+                  "channel_setup": [
+                    300,
+                    "r"
+                  ]
+                },
+                {
+                  "channel": 20,
+                  "name": "c",
+                  "type": "binary",
+                  "channel_setup": "zz"
+                },
+                {
+                  "channel": 30,
+                  "name": "d",
+                  "type": "dimmer",
+                  "channel_setup": "dd"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "expected": [
+      {
+        "path": [
+          "nodes",
+          0,
+          "universes",
+          0,
+          "devices",
+          0,
+          "channel_setup"
+        ],
+        "code": "setup_char"
+      },
+      {
+        "path": [
+          "nodes",
+          0,
+          "universes",
+          0,
+          "devices",
+          1,
+          "channel_setup"
+        ],
+        "code": "setup_value"
+      },
+      {
+        "path": [
+          "nodes",
+          0,
+          "universes",
+          0,
+          "devices",
+          1,
+          "channel_setup"
+        ],
+        "code": "setup_char"
+      }
+    ]
+  },
+  {
+    "name": "overflow",
+    "config": {
+      "title": "",
+      "nodes": [
+        {
+          "host": "10.0.0.1",
+          "universes": [
+            {
+              "id": 0,
+              "devices": [
+                {
+                  "channel": 510,
+                  "name": "a",
+                  "type": "rgb",
+                  "channel_size": "16bit"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "expected": [
+      {
+        "path": [
+          "nodes",
+          0,
+          "universes",
+          0,
+          "devices",
+          0,
+          "channel"
+        ],
+        "code": "overflow"
+      }
+    ]
+  },
+  {
+    "name": "overlap",
+    "config": {
+      "title": "",
+      "nodes": [
+        {
+          "host": "10.0.0.1",
+          "universes": [
+            {
+              "id": 0,
+              "devices": [
+                {
+                  "channel": 1,
+                  "name": "a",
+                  "type": "rgbw"
+                },
+                {
+                  "channel": 4,
+                  "name": "b",
+                  "type": "dimmer",
+                  "channel_size": "16bit"
+                },
+                {
+                  "channel": 6,
+                  "name": "c"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "expected": [
+      {
+        "path": [
+          "nodes",
+          0,
+          "universes",
+          0,
+          "devices",
+          1,
+          "channel"
+        ],
+        "code": "overlap"
+      }
+    ]
+  },
+  {
+    "name": "duplicate names across nodes",
+    "config": {
+      "title": "",
+      "nodes": [
+        {
+          "host": "10.0.0.1",
+          "universes": [
+            {
+              "id": 0,
+              "devices": [
+                {
+                  "channel": 1,
+                  "name": "Kitchen Light"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "host": "h2",
+          "universes": [
+            {
+              "id": 0,
+              "devices": [
+                {
+                  "channel": 1,
+                  "name": "kitchen_light"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "expected": [
+      {
+        "path": [
+          "nodes",
+          1,
+          "universes",
+          0,
+          "devices",
+          0,
+          "name"
+        ],
+        "code": "duplicate"
+      }
+    ]
+  }
+]

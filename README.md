@@ -1,5 +1,10 @@
 # DMX Config UI
 
+[![HACS Custom](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://www.hacs.xyz/docs/faq/custom_repositories/)
+[![Release](https://img.shields.io/github/v/release/speedy3wk/ha-dmx-config-ui.svg)](https://github.com/speedy3wk/ha-dmx-config-ui/releases)
+[![CI](https://github.com/speedy3wk/ha-dmx-config-ui/actions/workflows/ci.yml/badge.svg)](https://github.com/speedy3wk/ha-dmx-config-ui/actions/workflows/ci.yml)
+[![Validate](https://github.com/speedy3wk/ha-dmx-config-ui/actions/workflows/validate.yml/badge.svg)](https://github.com/speedy3wk/ha-dmx-config-ui/actions/workflows/validate.yml)
+
 A Home Assistant integration that lets you configure [ha-artnet-led](https://github.com/Breina/ha-artnet-led) in a visual editor instead of hand-written YAML. It supports both the stable 0.x `artnet_led` format and the 1.x beta `dmx` format, with fixture-based control for moving lights.
 
 Deutsch: siehe [README.de.md](README.de.md).

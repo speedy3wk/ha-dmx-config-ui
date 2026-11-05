@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from custom_components.ha_artnet_led_uiconfig.fixtures import (
+from custom_components.dmx_config_ui.fixtures import (
     BUNDLED_DIR,
     FixtureError,
     find_fixture,

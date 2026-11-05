@@ -17,7 +17,7 @@ from .const import ARTNET_LED_URL, CONF_INCLUDE_FILE, DEFAULT_INCLUDE_FILE, DOMA
 from .files import is_valid_include_file
 
 
-class HaArtnetLedUiConfigFlow(ConfigFlow, domain=DOMAIN):
+class DmxConfigUiConfigFlow(ConfigFlow, domain=DOMAIN):
     """Single-instance config flow."""
 
     VERSION = 1

@@ -42,7 +42,7 @@ declare const __VERSION__: string;
 export const FRONTEND_VERSION = __VERSION__;
 
 const HISTORY_LIMIT = 100;
-const TARGET_STORAGE_KEY = "ha_artnet_led_uiconfig.target";
+const TARGET_STORAGE_KEY = "dmx_config_ui.target";
 const TARGETS: Target[] = ["dmx", "artnet_led"];
 
 interface ConfirmState {
@@ -90,7 +90,7 @@ const readStoredTarget = (): Target | undefined => {
   }
 };
 
-export class ArtnetLedUiConfigPanel extends LitElement {
+export class DmxConfigUiPanel extends LitElement {
   @property({ attribute: false }) public hass?: HomeAssistant;
   @property({ type: Boolean, reflect: true }) public narrow = false;
   @property({ attribute: false }) public panel?: { config?: { version?: string } };
@@ -1133,10 +1133,10 @@ export class ArtnetLedUiConfigPanel extends LitElement {
   ];
 }
 
-safeDefine("ha-artnet-led-uiconfig-panel", ArtnetLedUiConfigPanel);
+safeDefine("dmx-config-ui-panel", DmxConfigUiPanel);
 
 declare global {
   interface HTMLElementTagNameMap {
-    "ha-artnet-led-uiconfig-panel": ArtnetLedUiConfigPanel;
+    "dmx-config-ui-panel": DmxConfigUiPanel;
   }
 }

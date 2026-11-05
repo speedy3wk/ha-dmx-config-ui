@@ -4,10 +4,10 @@ from __future__ import annotations
 
 import pytest
 
-from custom_components.ha_artnet_led_uiconfig.fixtures import BUNDLED_DIR, load_fixture_dir
-from custom_components.ha_artnet_led_uiconfig.migrate import migrate
-from custom_components.ha_artnet_led_uiconfig.model import normalize_config
-from custom_components.ha_artnet_led_uiconfig.model_dmx import has_errors, validate_config
+from custom_components.dmx_config_ui.fixtures import BUNDLED_DIR, load_fixture_dir
+from custom_components.dmx_config_ui.migrate import migrate
+from custom_components.dmx_config_ui.model import normalize_config
+from custom_components.dmx_config_ui.model_dmx import has_errors, validate_config
 
 FIXTURES = load_fixture_dir(BUNDLED_DIR, "bundled")[0]
 

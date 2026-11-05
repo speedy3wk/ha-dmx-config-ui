@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from custom_components.ha_artnet_led_uiconfig.model import (
+from custom_components.dmx_config_ui.model import (
     ConfigFormatError,
     device_width,
     from_platform_entries,
@@ -54,7 +54,7 @@ def test_device_width(device: dict, width: int) -> None:
 def test_normalize_drops_empty_and_coerces() -> None:
     config = normalize_config(
         {
-            "type": "ha_artnet_led_uiconfig",
+            "type": "dmx_config_ui",
             "nodes": [
                 {
                     "host": " 1.2.3.4 ",

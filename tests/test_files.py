@@ -5,7 +5,7 @@ from __future__ import annotations
 import pytest
 import yaml
 
-from custom_components.ha_artnet_led_uiconfig.files import (
+from custom_components.dmx_config_ui.files import (
     add_dmx_include,
     add_include,
     find_top_level_block,
@@ -14,7 +14,7 @@ from custom_components.ha_artnet_led_uiconfig.files import (
     render_dmx_yaml,
     render_yaml,
 )
-from custom_components.ha_artnet_led_uiconfig.model import normalize_config, to_platform_entries
+from custom_components.dmx_config_ui.model import normalize_config, to_platform_entries
 
 
 def test_render_is_valid_yaml_with_special_characters(sample_config: dict) -> None:
@@ -42,29 +42,29 @@ def test_render_layout(sample_config: dict) -> None:
     ("configuration", "expected"),
     [
         (None, False),
-        ("light: !include ha_artnet_led_uiconfig.yaml\n", True),
-        ("light artnet_uiconfig: !include 'ha_artnet_led_uiconfig.yaml'  # x\n", True),
-        ("# light: !include ha_artnet_led_uiconfig.yaml\n", False),
+        ("light: !include dmx_config_ui.yaml\n", True),
+        ("light dmx_config_ui: !include 'dmx_config_ui.yaml'  # x\n", True),
+        ("# light: !include dmx_config_ui.yaml\n", False),
         ("light: !include other.yaml\n", False),
-        ("light: !include ha_artnet_led_uiconfig.yaml.bak\n", False),
+        ("light: !include dmx_config_ui.yaml.bak\n", False),
     ],
 )
 def test_is_included(configuration: str | None, expected: bool) -> None:
-    assert is_included(configuration, "ha_artnet_led_uiconfig.yaml") is expected
+    assert is_included(configuration, "dmx_config_ui.yaml") is expected
 
 
 def test_add_include_keeps_existing_light_key() -> None:
     original = "default_config:\nlight:\n  - platform: template\n"
     updated = add_include(original, "x.yaml")
-    assert updated == original + "\nlight artnet_uiconfig: !include x.yaml\n"
+    assert updated == original + "\nlight dmx_config_ui: !include x.yaml\n"
     assert add_include(updated, "x.yaml") == updated
-    assert add_include(None, "x.yaml") == "light artnet_uiconfig: !include x.yaml\n"
+    assert add_include(None, "x.yaml") == "light dmx_config_ui: !include x.yaml\n"
 
 
 @pytest.mark.parametrize(
     ("value", "valid"),
     [
-        ("ha_artnet_led_uiconfig.yaml", True),
+        ("dmx_config_ui.yaml", True),
         ("lights/artnet.yml", True),
         ("configuration.yaml", False),
         ("../secrets.yaml", False),

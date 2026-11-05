@@ -1,6 +1,6 @@
 /**
  * Constants and channel math mirroring
- * custom_components/ha_artnet_led_uiconfig/model.py (keep both in sync).
+ * custom_components/dmx_config_ui/model.py (keep both in sync).
  */
 import type { ChannelSetup, ChannelToken, DeviceConfig, DeviceType, UniverseConfig } from "./types";
 

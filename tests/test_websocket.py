@@ -12,7 +12,7 @@ import pytest
 from pytest_homeassistant_custom_component.common import async_mock_service
 import yaml
 
-from custom_components.ha_artnet_led_uiconfig.const import (
+from custom_components.dmx_config_ui.const import (
     DOMAIN,
     ISSUE_INCLUDE_MISSING,
     ISSUE_RESTART_REQUIRED,
@@ -105,7 +105,7 @@ async def test_deploy_invalid(
     result = (await _ws(hass_ws_client, hass, type=f"{DOMAIN}/deploy", config=bad))["result"]
     assert result["status"] == "invalid"
     assert {e["code"] for e in result["errors"]} == {"required"}
-    assert not (config_dir / "ha_artnet_led_uiconfig.yaml").exists()
+    assert not (config_dir / "dmx_config_ui.yaml").exists()
 
 
 async def test_deploy_without_include(
@@ -120,7 +120,7 @@ async def test_deploy_without_include(
     assert result["included"] is False
     assert result["restart_required"] is False
     check.assert_not_called()
-    written = (config_dir / "ha_artnet_led_uiconfig.yaml").read_text()
+    written = (config_dir / "dmx_config_ui.yaml").read_text()
     assert yaml.safe_load(written)[0]["platform"] == "artnet_led"
     assert _issue(hass, ISSUE_INCLUDE_MISSING) is not None
     assert _issue(hass, ISSUE_RESTART_REQUIRED) is None
@@ -129,7 +129,7 @@ async def test_deploy_without_include(
 async def test_deploy_with_include(
     hass: HomeAssistant, config_dir, setup_integration, hass_ws_client, sample_config
 ) -> None:
-    (config_dir / "configuration.yaml").write_text("light: !include ha_artnet_led_uiconfig.yaml\n")
+    (config_dir / "configuration.yaml").write_text("light: !include dmx_config_ui.yaml\n")
     client = await hass_ws_client(hass)
     with patch(CHECK, AsyncMock(return_value=None)):
         await client.send_json_auto_id({"type": f"{DOMAIN}/deploy", "config": sample_config})
@@ -139,7 +139,7 @@ async def test_deploy_with_include(
 
     assert first == {
         "status": "written",
-        "path": "ha_artnet_led_uiconfig.yaml",
+        "path": "dmx_config_ui.yaml",
         "included": True,
         "check_error": None,
         "restart_required": True,
@@ -158,7 +158,7 @@ async def test_deploy_with_include(
 async def test_deploy_reports_check_error(
     hass: HomeAssistant, config_dir, setup_integration, hass_ws_client, sample_config
 ) -> None:
-    (config_dir / "configuration.yaml").write_text("light: !include ha_artnet_led_uiconfig.yaml\n")
+    (config_dir / "configuration.yaml").write_text("light: !include dmx_config_ui.yaml\n")
     with patch(CHECK, AsyncMock(return_value="Integration error: artnet_led")):
         result = (await _ws(hass_ws_client, hass, type=f"{DOMAIN}/deploy", config=sample_config))[
             "result"
@@ -217,7 +217,7 @@ async def test_include_fix_flow(
     result = await _run_fix(hass, hass_client, ISSUE_INCLUDE_MISSING)
     assert result["type"] == "create_entry"
     assert configuration.read_text().endswith(
-        "\n\nlight artnet_uiconfig: !include ha_artnet_led_uiconfig.yaml\n"
+        "\n\nlight dmx_config_ui: !include dmx_config_ui.yaml\n"
     )
     assert _issue(hass, ISSUE_INCLUDE_MISSING) is None
     assert _issue(hass, ISSUE_RESTART_REQUIRED) is not None

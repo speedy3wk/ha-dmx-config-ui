@@ -42,4 +42,4 @@ jobs:
       - run: npm run build
       - name: Ensure committed bundle is up to date
         working-directory: .
-        run: git diff --exit-code -- custom_components/ha_artnet_led_uiconfig/frontend/dist
+        run: git diff --exit-code -- custom_components/dmx_config_ui/frontend/dist

@@ -18,7 +18,7 @@
           "include_file": "Include file"
         },
         "data_description": {
-          "include_file": "File in the configuration directory that receives the generated `artnet_led` platforms, e.g. `ha_artnet_led_uiconfig.yaml`."
+          "include_file": "File in the configuration directory that receives the generated `artnet_led` platforms, e.g. `dmx_config_ui.yaml`."
         }
       }
     },

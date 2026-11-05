@@ -28,6 +28,8 @@ Deutsch: siehe [README.de.md](README.de.md).
 
 ## Installation
 
+**Breaking change:** The integration domain changed from `ha_artnet_led_uiconfig` to `dmx_config_ui`. Existing pre-release installs must be removed and added again; saved editor settings are not migrated, while generated YAML files remain untouched.
+
 ### Marketplace (recommended, Home Assistant 2026.11+)
 
 The [Marketplace](https://www.home-assistant.io/integrations/marketplace/) is built into Home Assistant 2026.11 and newer. DMX Config UI is installed as a custom repository.
@@ -55,7 +57,7 @@ The fixture library combines:
 - Fixture definitions in `/config/fixtures` (or the configured fixture folder).
 - Files uploaded in the panel or searched and downloaded from the Open Fixture Library.
 
-Deploy writes `/config/ha_artnet_led_uiconfig_dmx.yaml` and adds the top-level include `dmx: !include ha_artnet_led_uiconfig_dmx.yaml`. If `configuration.yaml` already has a `dmx:` block, the Repairs action replaces it after backing up the original as `configuration.yaml.dmx_config_ui.bak`. A Home Assistant restart is required after deployment.
+Deploy writes `/config/dmx_config_ui_dmx.yaml` and adds the top-level include `dmx: !include dmx_config_ui_dmx.yaml`. If `configuration.yaml` already has a `dmx:` block, the Repairs action replaces it after backing up the original as `configuration.yaml.dmx_config_ui.bak`. A Home Assistant restart is required after deployment.
 
 The `dmx` format is still in beta and may change upstream. The editor keeps the legacy tab separate and never rewrites its configuration when editing or migrating to `dmx`.
 
@@ -66,33 +68,33 @@ Open the **DMX (1.0)** tab and choose **Migrate from 0.x**. The assistant maps s
 ## Deploying `artnet_led` 0.x
 1. Edit the configuration in the panel and click **Save**. The configuration is stored in Home Assistant's `.storage`.
 2. Click **Deploy**. You get a diff against the current file. Confirm with **Write file**.
-3. The integration writes `/config/ha_artnet_led_uiconfig.yaml`.
+3. The integration writes `/config/dmx_config_ui.yaml`.
 4. On first use, the file is not yet included. The panel shows the line to add, and **Settings → Repairs** offers to append it for you:
    ```yaml
-   light artnet_uiconfig: !include ha_artnet_led_uiconfig.yaml
+   light dmx_config_ui: !include dmx_config_ui.yaml
    ```
-   The labelled key (`light artnet_uiconfig:`) avoids clashing with an existing `light:` section.
+   The labelled key (`light dmx_config_ui:`) avoids clashing with an existing `light:` section.
 5. ha-artnet-led only reads its configuration at startup, so a **restart is required**. A Repairs issue appears. Fixing it checks the configuration and then restarts Home Assistant.
 
 Deploy is blocked while the configuration has validation errors.
 
 ## Options
 **Settings → Devices & services → DMX Config UI → Configure**
-- **Include file**: the name of the generated file, relative to `/config`. The default is `ha_artnet_led_uiconfig.yaml`.
+- **Include file**: the name of the generated file, relative to `/config`. The default is `dmx_config_ui.yaml`.
 
 ## Lovelace card (optional)
 The editor can also be embedded as a card.
-1. **Settings → Dashboards → ⋮ → Resources**: add `/api/ha_artnet_led_uiconfig/ha-artnet-led-uiconfig.js` as a *JavaScript module*.
+1. **Settings → Dashboards → ⋮ → Resources**: add `/api/dmx_config_ui/dmx-config-ui.js` as a *JavaScript module*.
 2. Add the card:
    ```yaml
-   type: custom:ha-artnet-led-uiconfig
+   type: custom:dmx-config-ui
    ```
 
 ## Migrating from 0.1.x (add-on)
 Version 0.2.0 no longer needs the companion add-on/app. The integration writes the YAML file itself.
 1. Uninstall the **Art-Net LED UI Config** add-on and remove its repository from the add-on store.
 2. Update the integration via **Settings → Updates** (Marketplace on Home Assistant 2026.11+) or the installation method used on older supported versions, then restart.
-3. Your stored configuration is kept. An existing `light: !include ha_artnet_led_uiconfig.yaml` line keeps working and is detected.
+3. The saved editor configuration from the old integration domain is not migrated. Existing generated YAML files remain untouched; set **Include file** to an existing file if you want to keep deploying to it.
 4. If you previously maintained the config by hand, use **⋮ → Import from configuration.yaml** in the **Art-Net LED (0.x)** tab.
 
 ## Screenshots
@@ -135,7 +137,7 @@ python -m venv .venv && .venv/bin/pip install -r requirements_test.txt
 cd frontend
 npm ci
 npm run lint && npm test
-npm run build   # writes custom_components/ha_artnet_led_uiconfig/frontend/dist/
+npm run build   # writes custom_components/dmx_config_ui/frontend/dist/
 ```
 The built bundle is committed, and CI checks that it is up to date. The validation rules exist in Python and TypeScript for both targets. Their shared cases are tested against `tests/fixtures/validation_cases.json` and `tests/fixtures/dmx_validation_cases.json`. The weekly validation workflow checks DMX output against Breina's `platform-refactor2` branch.
 

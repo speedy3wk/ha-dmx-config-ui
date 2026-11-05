@@ -11,7 +11,7 @@ from homeassistant.helpers import issue_registry as ir
 from homeassistant.setup import async_setup_component
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from custom_components.ha_artnet_led_uiconfig.const import (
+from custom_components.dmx_config_ui.const import (
     DOMAIN,
     ISSUE_RESTART_REQUIRED,
     PANEL_URL_PATH,
@@ -31,7 +31,7 @@ async def test_setup_registers_panel(
     assert panel is not None
     assert panel.require_admin
     module_url = panel.config["_panel_custom"]["module_url"]
-    assert module_url.startswith(f"/api/{DOMAIN}/ha-artnet-led-uiconfig.js?v=")
+    assert module_url.startswith(f"/api/{DOMAIN}/dmx-config-ui.js?v=")
 
 
 async def test_unload_and_reload(hass: HomeAssistant, setup_integration: MockConfigEntry) -> None:
@@ -54,7 +54,7 @@ async def test_storage_migration_from_v1(hass: HomeAssistant, hass_storage: dict
         "minor_version": 1,
         "key": STORE_KEY,
         "data": {
-            "type": "ha_artnet_led_uiconfig",
+            "type": "dmx_config_ui",
             "title": "",
             "nodes": [{"host": "1.2.3.4", "port": None, "universes": [{"id": 0, "devices": []}]}],
         },

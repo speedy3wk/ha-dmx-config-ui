@@ -14,7 +14,7 @@ import type {
   OflSearchResult
 } from "./types_dmx";
 
-const DOMAIN = "ha_artnet_led_uiconfig";
+const DOMAIN = "dmx_config_ui";
 
 export type AnyConfig = UiConfig | DmxConfig;
 

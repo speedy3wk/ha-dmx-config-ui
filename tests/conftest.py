@@ -7,7 +7,7 @@ from homeassistant.setup import async_setup_component
 import pytest
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from custom_components.ha_artnet_led_uiconfig.const import DOMAIN
+from custom_components.dmx_config_ui.const import DOMAIN
 
 
 @pytest.fixture(autouse=True)

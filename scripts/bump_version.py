@@ -31,7 +31,7 @@ def main() -> int:
         print(__doc__)
         return 1
     version = sys.argv[1]
-    _json_version(ROOT / "custom_components/ha_artnet_led_uiconfig/manifest.json", version)
+    _json_version(ROOT / "custom_components/dmx_config_ui/manifest.json", version)
     _json_version(ROOT / "frontend/package.json", version)
     _json_version(ROOT / "frontend/package-lock.json", version, count=2)
     _replace(ROOT / "pyproject.toml", r'^version = "[^"]*"', f'version = "{version}"', 1)

@@ -4,17 +4,17 @@ from __future__ import annotations
 
 from typing import Final
 
-DOMAIN: Final = "ha_artnet_led_uiconfig"
+DOMAIN: Final = "dmx_config_ui"
 ARTNET_DOMAIN: Final = "artnet_led"
 DMX_DOMAIN: Final = "dmx"
 
-PANEL_URL_PATH: Final = "artnet-led-uiconfig"
+PANEL_URL_PATH: Final = "dmx-config-ui"
 PANEL_TITLE: Final = "DMX Config UI"
 PANEL_ICON: Final = "mdi:spotlight-beam"
-PANEL_COMPONENT: Final = "ha-artnet-led-uiconfig-panel"
+PANEL_COMPONENT: Final = "dmx-config-ui-panel"
 
 STATIC_PATH: Final = f"/api/{DOMAIN}"
-BUNDLE_FILE: Final = "ha-artnet-led-uiconfig.js"
+BUNDLE_FILE: Final = "dmx-config-ui.js"
 
 WS_GET: Final = f"{DOMAIN}/get"
 WS_SAVE: Final = f"{DOMAIN}/save"
@@ -32,9 +32,9 @@ TARGET_ARTNET: Final = "artnet_led"
 TARGET_DMX: Final = "dmx"
 
 CONF_INCLUDE_FILE: Final = "include_file"
-DEFAULT_INCLUDE_FILE: Final = "ha_artnet_led_uiconfig.yaml"
-INCLUDE_KEY: Final = "light artnet_uiconfig"
-DMX_INCLUDE_FILE: Final = "ha_artnet_led_uiconfig_dmx.yaml"
+DEFAULT_INCLUDE_FILE: Final = "dmx_config_ui.yaml"
+INCLUDE_KEY: Final = "light dmx_config_ui"
+DMX_INCLUDE_FILE: Final = "dmx_config_ui_dmx.yaml"
 CONFIGURATION_BACKUP: Final = "configuration.yaml.dmx_config_ui.bak"
 
 ISSUE_RESTART_REQUIRED: Final = "restart_required"

@@ -4,10 +4,10 @@ import "./panel";
 import type { HomeAssistant } from "./types";
 import { safeDefine } from "./utils/define";
 
-const CARD_TYPE = "ha-artnet-led-uiconfig";
+const CARD_TYPE = "dmx-config-ui";
 
-/** Dashboard card embedding the editor (`type: custom:ha-artnet-led-uiconfig`). */
-export class ArtnetLedUiConfigCard extends LitElement {
+/** Dashboard card embedding the editor (`type: custom:dmx-config-ui`). */
+export class DmxConfigUiCard extends LitElement {
   @property({ attribute: false }) public hass?: HomeAssistant;
 
   public setConfig(_config: Record<string, unknown>) {
@@ -28,7 +28,7 @@ export class ArtnetLedUiConfigCard extends LitElement {
 
   protected render() {
     return html`<ha-card>
-      <ha-artnet-led-uiconfig-panel embedded .hass=${this.hass}></ha-artnet-led-uiconfig-panel>
+      <dmx-config-ui-panel embedded .hass=${this.hass}></dmx-config-ui-panel>
     </ha-card>`;
   }
 
@@ -42,7 +42,7 @@ export class ArtnetLedUiConfigCard extends LitElement {
   `;
 }
 
-safeDefine(CARD_TYPE, ArtnetLedUiConfigCard);
+safeDefine(CARD_TYPE, DmxConfigUiCard);
 
 interface CustomCardEntry {
   type: string;

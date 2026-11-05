@@ -18,7 +18,7 @@
           "include_file": "Include-Datei"
         },
         "data_description": {
-          "include_file": "Datei im Konfigurationsverzeichnis, in die die generierten `artnet_led`-Plattformen geschrieben werden, z. B. `ha_artnet_led_uiconfig.yaml`."
+          "include_file": "Datei im Konfigurationsverzeichnis, in die die generierten `artnet_led`-Plattformen geschrieben werden, z. B. `dmx_config_ui.yaml`."
         }
       }
     },

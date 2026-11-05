@@ -1,6 +1,6 @@
 /**
  * Strict validation mirroring validate_config() in
- * custom_components/ha_artnet_led_uiconfig/model.py (same paths and codes).
+ * custom_components/dmx_config_ui/model.py (same paths and codes).
  */
 import {
   ALLOWED_SETUP_CHARS,

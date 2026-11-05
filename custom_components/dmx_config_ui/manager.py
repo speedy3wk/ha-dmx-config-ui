@@ -46,7 +46,7 @@ from .model import (
 
 _LOGGER = logging.getLogger(__name__)
 
-type ArtnetUiConfigEntry = ConfigEntry[UiConfigManager]
+type DmxConfigUiConfigEntry = ConfigEntry[UiConfigManager]
 
 
 class ConfigStore(Store[dict[str, Any]]):

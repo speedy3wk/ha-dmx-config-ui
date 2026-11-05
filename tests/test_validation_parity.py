@@ -5,8 +5,8 @@ from pathlib import Path
 
 import pytest
 
-from custom_components.ha_artnet_led_uiconfig.model import normalize_config, validate_config
-from custom_components.ha_artnet_led_uiconfig.model_dmx import (
+from custom_components.dmx_config_ui.model import normalize_config, validate_config
+from custom_components.dmx_config_ui.model_dmx import (
     normalize_config as normalize_dmx,
     validate_config as validate_dmx,
 )

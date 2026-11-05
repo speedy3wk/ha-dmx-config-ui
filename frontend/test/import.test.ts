@@ -46,7 +46,7 @@ light:
   - platform: artnet_led
     host: a
     universes: {1: {devices: []}}
-light artnet_uiconfig: !include ha_artnet_led_uiconfig.yaml
+light dmx_config_ui: !include dmx_config_ui.yaml
 light extra:
   platform: artnet_led
   host: b

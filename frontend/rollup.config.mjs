@@ -10,7 +10,7 @@ const { version } = JSON.parse(readFileSync(new URL("./package.json", import.met
 export default {
   input: "src/index.ts",
   output: {
-    file: "../custom_components/ha_artnet_led_uiconfig/frontend/dist/ha-artnet-led-uiconfig.js",
+    file: "../custom_components/dmx_config_ui/frontend/dist/dmx-config-ui.js",
     format: "es",
     sourcemap: true
   },

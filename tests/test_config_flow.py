@@ -7,7 +7,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from custom_components.ha_artnet_led_uiconfig.const import CONF_INCLUDE_FILE, DOMAIN
+from custom_components.dmx_config_ui.const import CONF_INCLUDE_FILE, DOMAIN
 
 
 async def test_user_flow(hass: HomeAssistant) -> None:

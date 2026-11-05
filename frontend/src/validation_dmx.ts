@@ -1,6 +1,6 @@
 /**
  * Strict validation mirroring validate_config() in
- * custom_components/ha_artnet_led_uiconfig/model_dmx.py (same paths, codes and severities).
+ * custom_components/dmx_config_ui/model_dmx.py (same paths, codes and severities).
  */
 import {
   CURVES,

@@ -91,17 +91,17 @@ def _load_breina(breina: Path) -> tuple[Any, Any]:
 
 def main(breina: Path) -> int:
     schema, parse = _load_breina(breina)
-    from custom_components.ha_artnet_led_uiconfig.files import render_dmx_yaml
-    from custom_components.ha_artnet_led_uiconfig.fixtures import (
+    from custom_components.dmx_config_ui.files import render_dmx_yaml
+    from custom_components.dmx_config_ui.fixtures import (
         BUNDLED_DIR,
         find_fixture,
         load_fixture_dir,
     )
-    from custom_components.ha_artnet_led_uiconfig.migrate import migrate
-    from custom_components.ha_artnet_led_uiconfig.model import (
+    from custom_components.dmx_config_ui.migrate import migrate
+    from custom_components.dmx_config_ui.model import (
         normalize_config as normalize_legacy,
     )
-    from custom_components.ha_artnet_led_uiconfig.model_dmx import (
+    from custom_components.dmx_config_ui.model_dmx import (
         iter_universes,
         normalize_config,
     )

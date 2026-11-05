@@ -22,7 +22,7 @@ from .const import (
     PANEL_URL_PATH,
     STATIC_PATH,
 )
-from .manager import ArtnetUiConfigEntry, UiConfigManager
+from .manager import DmxConfigUiConfigEntry, UiConfigManager
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -39,7 +39,7 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
     return True
 
 
-async def async_setup_entry(hass: HomeAssistant, entry: ArtnetUiConfigEntry) -> bool:
+async def async_setup_entry(hass: HomeAssistant, entry: DmxConfigUiConfigEntry) -> bool:
     integration = await async_get_integration(hass, DOMAIN)
     version = str(integration.version)
     entry.runtime_data = UiConfigManager(hass, entry, version)
@@ -64,6 +64,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ArtnetUiConfigEntry) -> 
     return True
 
 
-async def async_unload_entry(hass: HomeAssistant, entry: ArtnetUiConfigEntry) -> bool:
+async def async_unload_entry(hass: HomeAssistant, entry: DmxConfigUiConfigEntry) -> bool:
     frontend.async_remove_panel(hass, PANEL_URL_PATH)
     return True

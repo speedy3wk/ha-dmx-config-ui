@@ -5,9 +5,9 @@ from __future__ import annotations
 import pytest
 import yaml
 
-from custom_components.ha_artnet_led_uiconfig.files import render_dmx_yaml
-from custom_components.ha_artnet_led_uiconfig.model import ConfigFormatError
-from custom_components.ha_artnet_led_uiconfig.model_dmx import (
+from custom_components.dmx_config_ui.files import render_dmx_yaml
+from custom_components.dmx_config_ui.model import ConfigFormatError
+from custom_components.dmx_config_ui.model_dmx import (
     device_width,
     empty_config,
     from_yaml,

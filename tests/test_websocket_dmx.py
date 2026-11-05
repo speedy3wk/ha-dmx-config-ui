@@ -11,7 +11,7 @@ from homeassistant.helpers import issue_registry as ir
 import pytest
 import yaml
 
-from custom_components.ha_artnet_led_uiconfig.const import (
+from custom_components.dmx_config_ui.const import (
     CONFIGURATION_BACKUP,
     DMX_INCLUDE_FILE,
     DOMAIN,
@@ -19,7 +19,7 @@ from custom_components.ha_artnet_led_uiconfig.const import (
     ISSUE_INCLUDE_MISSING,
     ISSUE_RESTART_REQUIRED,
 )
-from custom_components.ha_artnet_led_uiconfig.ofl import OFL_BASE, OFL_SEARCH
+from custom_components.dmx_config_ui.ofl import OFL_BASE, OFL_SEARCH
 
 from .test_websocket import _run_fix
 

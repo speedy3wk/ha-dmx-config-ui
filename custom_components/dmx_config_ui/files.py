@@ -1,18 +1,16 @@
-"""File handling: render, write and include the generated ha-artnet-led YAML."""
+"""File handling for generated DMX YAML."""
 
 from __future__ import annotations
 
 from collections.abc import Mapping
 import difflib
-from pathlib import Path, PurePosixPath
+from pathlib import Path
 import re
 from typing import Any
 
 from homeassistant.util.file import write_utf8_file_atomic
 import yaml
 
-from .const import INCLUDE_KEY
-from .model import to_platform_entries
 from .model_dmx import DMX_DOMAIN, to_yaml_dict
 
 HEADER = (
@@ -40,24 +38,9 @@ def _dump(data: Any) -> str:
     )
 
 
-def render_yaml(config: Mapping[str, Any]) -> str:
-    """Render the UI config as the content of the include file (a list of platforms)."""
-    return HEADER + _dump(to_platform_entries(config))
-
-
 def render_dmx_yaml(config: Mapping[str, Any]) -> str:
     """Render the dmx UI config as the content of the `dmx: !include` file."""
     return HEADER + _dump(to_yaml_dict(config))
-
-
-def is_valid_include_file(value: str) -> bool:
-    """Accept relative *.yaml/*.yml paths inside the config directory only."""
-    if not value or "\\" in value:
-        return False
-    path = PurePosixPath(value)
-    if path.is_absolute() or ".." in path.parts or path.name == CONFIGURATION_FILE:
-        return False
-    return path.suffix in (".yaml", ".yml")
 
 
 def read_text(path: Path) -> str | None:
@@ -97,8 +80,8 @@ def is_included(configuration: str | None, include_file: str) -> bool:
     return bool(_include_pattern(include_file).search(configuration))
 
 
-def add_include(configuration: str | None, include_file: str, key: str = INCLUDE_KEY) -> str:
-    """Append a labelled `light` include so an existing `light:` key is not duplicated."""
+def add_include(configuration: str | None, include_file: str, key: str) -> str:
+    """Append a top-level include."""
     line = f"{key}: !include {include_file}\n"
     if not configuration:
         return line

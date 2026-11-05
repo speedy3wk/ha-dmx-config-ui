@@ -1,6 +1,6 @@
 """Summaries of Open Fixture Library (OFL) fixture definitions.
 
-ha-artnet-led 1.x (`dmx`) loads OFL JSON files from a folder. This module reads
+DMX loads OFL JSON files from a folder. This module reads
 the same files and derives what the editor needs: identifiers, modes, the DMX
 footprint of every mode and a rough preview of the entities that will be created.
 It intentionally has no Home Assistant imports so it can be unit tested.

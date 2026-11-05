@@ -10,7 +10,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResult
 import voluptuous as vol
 
-from .const import ISSUE_DMX_INCLUDE_MISSING, ISSUE_INCLUDE_MISSING, ISSUE_RESTART_REQUIRED
+from .const import ISSUE_DMX_INCLUDE_MISSING, ISSUE_RESTART_REQUIRED
 from .manager import async_get_manager
 
 
@@ -35,22 +35,6 @@ class RestartRequiredFlow(RepairsFlow):
         return self.async_create_entry(data={})
 
 
-class IncludeMissingFlow(RepairsFlow):
-    """Add the include line to configuration.yaml."""
-
-    async def async_step_init(self, user_input: dict[str, Any] | None = None) -> FlowResult:
-        return await self.async_step_confirm()
-
-    async def async_step_confirm(self, user_input: dict[str, Any] | None = None) -> FlowResult:
-        manager = async_get_manager(self.hass)
-        if manager is None:
-            return self.async_abort(reason="not_loaded")
-        if user_input is None:
-            return self.async_show_form(step_id="confirm", data_schema=vol.Schema({}))
-        await manager.async_fix_include()
-        return self.async_create_entry(data={})
-
-
 class DmxIncludeMissingFlow(RepairsFlow):
     """Point the `dmx:` key of configuration.yaml to the generated file."""
 
@@ -70,8 +54,6 @@ class DmxIncludeMissingFlow(RepairsFlow):
 async def async_create_fix_flow(
     hass: HomeAssistant, issue_id: str, data: dict[str, Any] | None
 ) -> RepairsFlow:
-    if issue_id == ISSUE_INCLUDE_MISSING:
-        return IncludeMissingFlow()
     if issue_id == ISSUE_DMX_INCLUDE_MISSING:
         return DmxIncludeMissingFlow()
     if issue_id == ISSUE_RESTART_REQUIRED:

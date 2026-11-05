@@ -15,8 +15,6 @@ const en = {
   undo: "Undo",
   redo: "Redo",
   more: "More",
-  addNode: "Add node",
-  importYaml: "Import YAML…",
   importExisting: "Import from configuration.yaml",
   importJson: "Import JSON file…",
   exportJson: "Export JSON",
@@ -26,8 +24,6 @@ const en = {
   unsaved: "Unsaved changes",
   errorsCount: "{count} validation error(s)",
   // status banners
-  artnetMissing:
-    "The ha-artnet-led integration (artnet_led) does not seem to be installed. Install it via HACS, otherwise the generated lights will not work.",
   includeMissing: "{path} is not yet included in your configuration.yaml. Add this line or use the repair:",
   openRepairs: "Open repairs",
   restartPending: "A Home Assistant restart is required to apply the deployed configuration.",
@@ -45,13 +41,7 @@ const en = {
   confirmReloadText: "You have unsaved changes. Reloading discards them.",
   confirmImportTitle: "Replace configuration?",
   confirmImportText: "The imported configuration replaces the current one. You can undo this.",
-  // import dialog
-  importYamlTitle: "Import YAML",
-  importYamlSubtitle:
-    "Paste ha-artnet-led configuration: a `light:` block, a list of platform entries or a single entry.",
-  importAction: "Import",
   importFailed: "Import failed: {error}",
-  importNothing: "No artnet_led configuration found in configuration.yaml.",
   // deploy dialog
   deployTitle: "Deploy configuration",
   deployTarget: "Target file: {path}",
@@ -143,20 +133,10 @@ const en = {
   ch_U: "Saturation",
   ch_x: "X (CIE xy)",
   ch_y: "Y (CIE xy)",
-  // targets / backends
-  tabLegacy: "ha-artnet-led 0.x",
-  tabLegacySub: "artnet_led · lights",
-  tabDmx: "ha-artnet-led 1.x",
-  tabDmxSub: "dmx · fixtures, moving heads",
-  backendInstalled: "installed {version}",
-  backendMissing: "not installed",
   dmxMissing:
-    "ha-artnet-led 1.x (dmx) does not seem to be installed. You can prepare the configuration now; it is used as soon as 1.x is installed.",
+    "The DMX integration does not seem to be installed. You can prepare the configuration now; it is used as soon as DMX is installed.",
   dmxForeignBlock:
     "configuration.yaml already contains a dmx: block. The repair replaces it with the include (a backup is created).",
-  dmxSuggestMigrate:
-    "ha-artnet-led 1.x is installed and you have a 0.x configuration. Use \"Migrate from 0.x\" to convert it.",
-  migrateFrom0x: "Migrate from 0.x…",
   dmxFixtureErrors: "Some fixture files could not be read:",
   importNothingDmx: "No dmx configuration found in configuration.yaml.",
   warningsCount: "{count} warning(s)",
@@ -231,26 +211,6 @@ const en = {
   dmxFilter: "Filter…",
   dmxBundledExplain:
     "\"bundled\" fixtures ship with this integration (generic faders) and are copied into the folder when used.",
-  // migration
-  migTitle: "Migrate from ha-artnet-led 0.x",
-  migSubtitle: "Converts your artnet_led lights into dmx fixtures using the generic faders.",
-  migSummary: "{devices} light(s) in {universes} universe(s) will be converted. Fixtures: {fixtures}",
-  migNotes: "Notes per light",
-  migReplaces: "This replaces the current 1.x configuration in the editor (you can undo this).",
-  migNextSteps: "Review the result, then deploy. Your 0.x configuration is not changed.",
-  migNothing: "There is no 0.x configuration to migrate.",
-  migApply: "Apply",
-  mig_entity_ids_change:
-    "Entity IDs change: ha-artnet-led 1.x creates new entities (e.g. light.<prefix>_…). Update automations, scripts and dashboards.",
-  mig_kinet_unsupported: "Node {host}: KiNET is not supported by 1.x – skipped.",
-  mig_sacn_universe_zero: "Node {host}: sACN universe 0 is invalid – universe 1 is used.",
-  mig_binary_as_dimmer: "binary light becomes a dimmer channel.",
-  mig_channel_setup: "custom channel order ({channel_setup}) is not supported – default order used.",
-  mig_type_unsupported: "type {type} has no generic fixture – skipped.",
-  mig_bit_depth: "no {bits} bit mode found – mode {mode} is used.",
-  mig_byte_order: "little endian byte order is not supported.",
-  mig_transition: "default transition is not supported in 1.x.",
-  mig_color_temp_range: "min/max colour temperature is defined by the fixture in 1.x.",
   // validation
   err_required: "Required",
   err_range: "Must be between {low} and {high}",
@@ -286,8 +246,6 @@ const de: Record<TextKey, string> = {
   undo: "Rückgängig",
   redo: "Wiederholen",
   more: "Mehr",
-  addNode: "Node hinzufügen",
-  importYaml: "YAML importieren…",
   importExisting: "Aus configuration.yaml importieren",
   importJson: "JSON-Datei importieren…",
   exportJson: "Als JSON exportieren",
@@ -296,8 +254,6 @@ const de: Record<TextKey, string> = {
   reload: "Vom Server neu laden",
   unsaved: "Ungespeicherte Änderungen",
   errorsCount: "{count} Validierungsfehler",
-  artnetMissing:
-    "Die Integration ha-artnet-led (artnet_led) scheint nicht installiert zu sein. Installiere sie über HACS, sonst funktionieren die erzeugten Lampen nicht.",
   includeMissing:
     "{path} ist noch nicht in deiner configuration.yaml eingebunden. Füge diese Zeile hinzu oder nutze die Reparatur:",
   openRepairs: "Reparaturen öffnen",
@@ -315,12 +271,7 @@ const de: Record<TextKey, string> = {
   confirmReloadText: "Es gibt ungespeicherte Änderungen. Neu laden verwirft sie.",
   confirmImportTitle: "Konfiguration ersetzen?",
   confirmImportText: "Die importierte Konfiguration ersetzt die aktuelle. Das lässt sich rückgängig machen.",
-  importYamlTitle: "YAML importieren",
-  importYamlSubtitle:
-    "Füge eine ha-artnet-led Konfiguration ein: einen `light:`-Block, eine Liste von Plattform-Einträgen oder einen einzelnen Eintrag.",
-  importAction: "Importieren",
   importFailed: "Import fehlgeschlagen: {error}",
-  importNothing: "Keine artnet_led Konfiguration in der configuration.yaml gefunden.",
   deployTitle: "Konfiguration deployen",
   deployTarget: "Zieldatei: {path}",
   deployNoChanges: "Die Datei ist bereits aktuell.",
@@ -409,20 +360,10 @@ const de: Record<TextKey, string> = {
   ch_U: "Sättigung",
   ch_x: "X (CIE xy)",
   ch_y: "Y (CIE xy)",
-  // targets / backends
-  tabLegacy: "ha-artnet-led 0.x",
-  tabLegacySub: "artnet_led · Lichter",
-  tabDmx: "ha-artnet-led 1.x",
-  tabDmxSub: "dmx · Fixtures, Moving Heads",
-  backendInstalled: "installiert {version}",
-  backendMissing: "nicht installiert",
   dmxMissing:
-    "ha-artnet-led 1.x (dmx) scheint nicht installiert zu sein. Du kannst die Konfiguration schon vorbereiten; sie wird genutzt, sobald 1.x installiert ist.",
+    "Die DMX-Integration scheint nicht installiert zu sein. Du kannst die Konfiguration schon vorbereiten; sie wird genutzt, sobald DMX installiert ist.",
   dmxForeignBlock:
     "configuration.yaml enthält bereits einen dmx:-Block. Die Reparatur ersetzt ihn durch das Include (ein Backup wird angelegt).",
-  dmxSuggestMigrate:
-    "ha-artnet-led 1.x ist installiert und du hast eine 0.x-Konfiguration. Mit „Von 0.x migrieren“ kannst du sie übernehmen.",
-  migrateFrom0x: "Von 0.x migrieren…",
   dmxFixtureErrors: "Einige Fixture-Dateien konnten nicht gelesen werden:",
   importNothingDmx: "Keine dmx-Konfiguration in der configuration.yaml gefunden.",
   warningsCount: "{count} Warnung(en)",
@@ -497,26 +438,6 @@ const de: Record<TextKey, string> = {
   dmxFilter: "Filtern…",
   dmxBundledExplain:
     "„Mitgeliefert“ sind generische Fader dieser Integration; sie werden bei Verwendung in den Ordner kopiert.",
-  // migration
-  migTitle: "Von ha-artnet-led 0.x migrieren",
-  migSubtitle: "Wandelt deine artnet_led-Lichter in dmx-Fixtures mit den generischen Fadern um.",
-  migSummary: "{devices} Licht(er) in {universes} Universe(s) werden übernommen. Fixtures: {fixtures}",
-  migNotes: "Hinweise pro Licht",
-  migReplaces: "Die aktuelle 1.x-Konfiguration im Editor wird ersetzt (rückgängig machbar).",
-  migNextSteps: "Prüfe das Ergebnis und deploye dann. Deine 0.x-Konfiguration bleibt unverändert.",
-  migNothing: "Es gibt keine 0.x-Konfiguration zum Migrieren.",
-  migApply: "Übernehmen",
-  mig_entity_ids_change:
-    "Entity-IDs ändern sich: ha-artnet-led 1.x erzeugt neue Entitäten (z. B. light.<präfix>_…). Passe Automationen, Skripte und Dashboards an.",
-  mig_kinet_unsupported: "Node {host}: KiNET wird von 1.x nicht unterstützt – übersprungen.",
-  mig_sacn_universe_zero: "Node {host}: sACN-Universe 0 ist ungültig – Universe 1 wird verwendet.",
-  mig_binary_as_dimmer: "binary-Licht wird zu einem Dimmer-Kanal.",
-  mig_channel_setup: "eigene Kanalreihenfolge ({channel_setup}) wird nicht unterstützt – Standardreihenfolge.",
-  mig_type_unsupported: "Typ {type} hat kein generisches Fixture – übersprungen.",
-  mig_bit_depth: "kein {bits}-Bit-Modus gefunden – Modus {mode} wird verwendet.",
-  mig_byte_order: "Little-Endian-Byte-Reihenfolge wird nicht unterstützt.",
-  mig_transition: "Standard-Transition wird in 1.x nicht unterstützt.",
-  mig_color_temp_range: "Min./max. Farbtemperatur legt in 1.x das Fixture fest.",
   err_required: "Pflichtfeld",
   err_range: "Muss zwischen {low} und {high} liegen",
   err_choice: "Erlaubt: {choices}",

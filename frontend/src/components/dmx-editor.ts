@@ -1,6 +1,7 @@
 import { LitElement, css, html, nothing } from "lit";
 import { property, state } from "lit/decorators.js";
 import { issueText, type Translate } from "../i18n";
+import { IssueIndex } from "../issue-index";
 import {
   ARTNET_DEFAULT_PORT,
   DEFAULT_FOLDER,
@@ -31,7 +32,6 @@ import type {
 import { safeDefine } from "../utils/define";
 import { clone, moveItem } from "../utils/mutate";
 import { checkField, icon, numberField, sharedStyles, textField } from "../utils/ui";
-import { IssueIndex } from "../validation";
 import { deviceColor } from "./channel-map";
 import type { DmxDeviceLocation, DmxDeviceSaveDetail } from "./dmx-device-dialog";
 import "./channel-map";
@@ -39,7 +39,7 @@ import "./dmx-device-dialog";
 
 const isError = (issue: ValidationIssue) => (issue.severity ?? "error") === "error";
 
-/** Visual editor for ha-artnet-led 1.x. Fires `config-changed` with {config} and `open-library`. */
+/** Visual editor for DMX. Fires `config-changed` with {config} and `open-library`. */
 export class AluDmxEditor extends LitElement {
   @property({ attribute: false }) public config!: DmxConfig;
   @property({ attribute: false }) public fixtures?: FixtureSummary[];

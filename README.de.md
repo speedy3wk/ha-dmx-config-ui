@@ -1,25 +1,22 @@
 # DMX Config UI
 
-Eine Home-Assistant-Integration, mit der du [ha-artnet-led](https://github.com/Breina/ha-artnet-led) in einem grafischen Editor statt per Hand-YAML konfigurierst. Unterstützt werden sowohl das stabile 0.x-Format `artnet_led` als auch das 1.x-Beta-Format `dmx` mit Fixtures für Moving Lights.
+Eine Home-Assistant-Integration, mit der du [DMX](https://github.com/Breina/ha-artnet-led) in einem grafischen Editor statt per Hand-YAML konfigurierst, einschließlich Fixtures für Moving Lights.
 
 English: see [README.md](README.md).
 
 ## Funktionen
-- Zwischen getrennten Editoren für `artnet_led` 0.x und `dmx` 1.x wechseln. Die Integration erkennt, welches Backend installiert ist.
 - Art-Net- und sACN-Universes, Fixtures und Modi konfigurieren. OFL-Fixtures ermöglichen unter anderem Pan, Tilt, Gobo, Prisma und Farbe.
 - Open-Fixture-Library-Dateien durchsuchen oder hochladen, mit Kanalbelegung und Vorschau der erzeugten Entitäten.
-- Bestehende `artnet_led`-Fixtures mit Vorschau und Warnungen zu nicht exakt übertragbaren Einstellungen migrieren.
-- Live-Validierung für doppelte IDs, Adressüberschneidungen, DMX-Kanalgrenzen und Fixture-Modi. Ein geplanter CI-Check vergleicht YAML und Kanalbreiten mit Breinas Beta-Parser.
-- Der alte Editor unterstützt weiterhin `artnet_led`-Optionen wie `xy`, Byte-Order, Kanal-Setups und erweiterte Node-Optionen.
+- Live-Validierung für doppelte IDs, Adressüberschneidungen, DMX-Kanalgrenzen und Fixture-Modi. Ein geplanter CI-Check vergleicht YAML und Kanalbreiten mit dem DMX-Parser.
 - DMX-Kanalbelegung je Universe, Funktion „Nächster freier Kanal“, Lampen und Universes duplizieren und sortieren.
 - Rückgängig/Wiederholen (<kbd>Strg</kbd>+<kbd>Z</kbd> / <kbd>Strg</kbd>+<kbd>Umschalt</kbd>+<kbd>Z</kbd>), Speichern mit <kbd>Strg</kbd>+<kbd>S</kbd>, Warnung bei ungespeicherten Änderungen.
-- Import aus eingefügtem YAML, aus der bestehenden `configuration.yaml` oder aus einer JSON-/YAML-Datei. Export als JSON.
+- Import aus der bestehenden `configuration.yaml` oder aus einer JSON-Datei. Export als JSON.
 - **Deploy** zeigt einen Diff, schreibt die jeweilige YAML-Datei atomar, prüft die HA-Konfiguration und legt Reparaturen für fehlende Includes oder nötige Neustarts an.
 - Sprachen: Deutsch und Englisch.
 
 ## Voraussetzungen
 - Home Assistant 2026.1 oder neuer
-- [ha-artnet-led](https://github.com/Breina/ha-artnet-led) 0.x oder 1.x Beta installiert (eine Konfiguration kann auch vorbereitet werden, bevor das Ziel-Backend installiert ist)
+- [DMX](https://github.com/Breina/ha-artnet-led) 1.0 oder neuer installiert (eine Konfiguration kann auch vorbereitet werden, bevor DMX installiert ist)
 
 ## Installation
 
@@ -43,9 +40,9 @@ Bestehende HACS-Installationen werden beim Update auf Home Assistant 2026.11 aut
 
 Nach der Installation erscheint das Panel **DMX Config UI** in der Seitenleiste. Nur Administratoren sehen es.
 
-## ha-artnet-led 1.x (`dmx`) bearbeiten
+## DMX bearbeiten
 
-Wähle den Tab **DMX (1.0)**. Dort kannst du Art-Net- und/oder sACN-Universes anlegen, Geräte hinzufügen und jeweils Fixture und Modus auswählen. Die Kanalbelegung zeigt den DMX-Bereich; der Dialog gibt eine Vorschau der erzeugten `light`-, `number`- und `select`-Entitäten.
+Du kannst Art-Net- und/oder sACN-Universes anlegen, Geräte hinzufügen und jeweils Fixture und Modus auswählen. Die Kanalbelegung zeigt den DMX-Bereich; der Dialog gibt eine Vorschau der erzeugten `light`-, `number`- und `select`-Entitäten.
 
 Die Fixture-Bibliothek enthält:
 - Generische Fixtures aus der Open Fixture Library (MIT-Lizenz).
@@ -54,28 +51,7 @@ Die Fixture-Bibliothek enthält:
 
 Deploy schreibt `/config/dmx_config_ui_dmx.yaml` und fügt `dmx: !include dmx_config_ui_dmx.yaml` als obersten Schlüssel ein. Gibt es bereits einen `dmx:`-Block in der `configuration.yaml`, ersetzt die Reparatur diesen nach einer Sicherung unter `configuration.yaml.dmx_config_ui.bak`. Nach Deploy ist ein Neustart nötig.
 
-Das Format `dmx` ist noch Beta und kann sich upstream ändern. Der alte Tab bleibt separat; beim Bearbeiten oder Migrieren nach `dmx` wird die alte Konfiguration nicht überschrieben.
-
-## Migration von `artnet_led` 0.x
-
-Öffne den Tab **DMX (1.0)** und wähle **Aus 0.x migrieren**. Der Assistent ordnet unterstützte Gerätetypen generischen OFL-Fixtures zu und zeigt vor dem Übernehmen Warnungen an. Nicht unterstützte Typen werden ausgelassen. Eigene Kanal-Setups, Übergänge, Byte-Order und Temperaturbereiche musst du gegebenenfalls manuell prüfen. Die Migration ändert zunächst nur das DMX-Dokument im Editor.
-
-## `artnet_led` 0.x deployen
-1. Konfiguration im Panel bearbeiten und **Speichern** klicken. Die Konfiguration landet im `.storage` von Home Assistant.
-2. **Deploy** klicken. Du siehst einen Diff zur aktuellen Datei. Mit **Datei schreiben** bestätigen.
-3. Die Integration schreibt `/config/dmx_config_ui.yaml`.
-4. Beim ersten Mal ist die Datei noch nicht eingebunden. Das Panel zeigt die nötige Zeile an, und unter **Einstellungen → Reparaturen** kannst du sie automatisch anhängen lassen:
-   ```yaml
-   light dmx_config_ui: !include dmx_config_ui.yaml
-   ```
-   Der benannte Schlüssel (`light dmx_config_ui:`) kollidiert nicht mit einem vorhandenen `light:`-Abschnitt.
-5. ha-artnet-led liest seine Konfiguration nur beim Start, daher ist ein **Neustart nötig**. Es erscheint eine Reparatur. Wenn du sie ausführst, wird die Konfiguration geprüft und Home Assistant anschließend neu gestartet.
-
 Solange die Konfiguration Fehler enthält, ist Deploy gesperrt.
-
-## Optionen
-**Einstellungen → Geräte & Dienste → DMX Config UI → Konfigurieren**
-- **Include-Datei**: Name der erzeugten Datei, relativ zu `/config`. Standard ist `dmx_config_ui.yaml`.
 
 ## Lovelace-Karte (optional)
 Der Editor lässt sich auch als Karte einbetten.
@@ -85,22 +61,7 @@ Der Editor lässt sich auch als Karte einbetten.
    type: custom:dmx-config-ui
    ```
 
-## Migration von 0.1.x (Add-on)
-Ab Version 0.2.0 wird das Add-on bzw. die App nicht mehr benötigt. Die Integration schreibt die YAML-Datei selbst.
-1. Das Add-on **Art-Net LED UI Config** deinstallieren und sein Repository aus dem Add-on-Store entfernen.
-2. Die Integration über **Einstellungen → Updates** (Marketplace ab Home Assistant 2026.11) oder den auf älteren unterstützten Versionen genutzten Installationsweg aktualisieren und neu starten.
-3. Die gespeicherte Editor-Konfiguration der alten Integrationsdomain wird nicht übernommen. Bereits erzeugte YAML-Dateien bleiben unverändert; unter **Include-Datei** kannst du eine vorhandene Datei weiterhin als Ziel setzen.
-4. Wenn du die Konfiguration bisher von Hand gepflegt hast: im Tab **Art-Net LED (0.x)** **⋮ → Aus configuration.yaml importieren** auswählen.
-
 ## Screenshots
-**Editor mit DMX-Kanalbelegung**
-
-![Editor mit DMX-Kanalbelegung](https://raw.githubusercontent.com/speedy3wk/ha-dmx-config-ui/main/docs/images/overview.png)
-
-**Lampen-Dialog mit Kanal-Setup-Editor**
-
-![Lampen-Dialog mit Kanal-Setup-Editor](https://raw.githubusercontent.com/speedy3wk/ha-dmx-config-ui/main/docs/images/light-dialog.png)
-
 **Deploy-Vorschau mit Diff**
 
 ![Deploy-Vorschau mit Diff](https://raw.githubusercontent.com/speedy3wk/ha-dmx-config-ui/main/docs/images/deploy.png)
@@ -117,10 +78,6 @@ Ab Version 0.2.0 wird das Add-on bzw. die App nicht mehr benötigt. Die Integrat
 
 ![Fixture-Suche und Bibliothek](https://raw.githubusercontent.com/speedy3wk/ha-dmx-config-ui/main/docs/images/fixture-library.png)
 
-**Migrationsvorschau**
-
-![Vorschau der Migration von Art-Net LED nach DMX](https://raw.githubusercontent.com/speedy3wk/ha-dmx-config-ui/main/docs/images/migration.png)
-
 ## Entwicklung
 ```bash
 # Backend
@@ -134,11 +91,11 @@ npm ci
 npm run lint && npm test
 npm run build   # schreibt nach custom_components/dmx_config_ui/frontend/dist/
 ```
-Das gebaute Bundle wird mit eingecheckt; die CI prüft, ob es aktuell ist. Die Validierungsregeln gibt es für beide Targets jeweils in Python und TypeScript. Gemeinsame Testfälle liegen in `tests/fixtures/validation_cases.json` und `tests/fixtures/dmx_validation_cases.json`. Der wöchentliche Workflow prüft die DMX-Ausgabe gegen Breinas Branch `platform-refactor2`.
+Das gebaute Bundle wird mit eingecheckt; die CI prüft, ob es aktuell ist. Python und TypeScript verwenden gemeinsame Validierungsfälle aus `tests/fixtures/dmx_validation_cases.json`. Der wöchentliche Workflow prüft die erzeugte Ausgabe gegen DMX selbst.
 
 Version anheben (Manifest, package.json, Lockfile und pyproject):
 ```bash
-python scripts/bump_version.py 0.3.1
+python scripts/bump_version.py 0.4.0
 ```
 
 ---

@@ -1,4 +1,4 @@
-"""Tests for setup, unload and storage migration."""
+"""Tests for setup and unload."""
 
 from __future__ import annotations
 
@@ -15,7 +15,6 @@ from custom_components.dmx_config_ui.const import (
     DOMAIN,
     ISSUE_RESTART_REQUIRED,
     PANEL_URL_PATH,
-    STORE_KEY,
 )
 
 
@@ -46,28 +45,6 @@ async def test_unload_and_reload(hass: HomeAssistant, setup_integration: MockCon
     assert await hass.config_entries.async_reload(setup_integration.entry_id)
     await hass.async_block_till_done()
     assert _panel(hass) is not None
-
-
-async def test_storage_migration_from_v1(hass: HomeAssistant, hass_storage: dict[str, Any]) -> None:
-    hass_storage[STORE_KEY] = {
-        "version": 1,
-        "minor_version": 1,
-        "key": STORE_KEY,
-        "data": {
-            "type": "dmx_config_ui",
-            "title": "",
-            "nodes": [{"host": "1.2.3.4", "port": None, "universes": [{"id": 0, "devices": []}]}],
-        },
-    }
-    assert await async_setup_component(hass, "http", {})
-    entry = MockConfigEntry(domain=DOMAIN, data={})
-    entry.add_to_hass(hass)
-    assert await hass.config_entries.async_setup(entry.entry_id)
-    config = await entry.runtime_data.async_get_config()
-    assert config == {
-        "title": "",
-        "nodes": [{"host": "1.2.3.4", "universes": [{"id": 0, "devices": []}]}],
-    }
 
 
 async def test_restart_issue_cleared_on_startup(hass: HomeAssistant) -> None:

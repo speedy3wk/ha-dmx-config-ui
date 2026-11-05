@@ -3,27 +3,11 @@
     "step": {
       "user": {
         "title": "DMX Config UI",
-        "description": "Adds the **DMX Config** panel to the sidebar. The panel writes the YAML configuration for [ha-artnet-led]({artnet_led_url}) – both 0.x (`artnet_led`) and 1.x (`dmx`)."
+        "description": "Adds the **DMX Config** panel to the sidebar. The panel writes the YAML configuration for [DMX]({dmx_url})."
       }
     },
     "abort": {
       "single_instance_allowed": "Already configured. Only a single configuration possible."
-    }
-  },
-  "options": {
-    "step": {
-      "init": {
-        "title": "DMX Config UI",
-        "data": {
-          "include_file": "Include file"
-        },
-        "data_description": {
-          "include_file": "File in the configuration directory that receives the generated `artnet_led` platforms, e.g. `dmx_config_ui.yaml`."
-        }
-      }
-    },
-    "error": {
-      "invalid_include_file": "Use a relative path ending with .yaml or .yml inside the configuration directory (not configuration.yaml)."
     }
   },
   "issues": {
@@ -33,7 +17,7 @@
         "step": {
           "confirm": {
             "title": "Restart Home Assistant",
-            "description": "`{include_file}` was updated. ha-artnet-led only reads its configuration at startup, so Home Assistant needs to be restarted. The configuration is checked before restarting."
+            "description": "`{include_file}` was updated. DMX only reads its configuration at startup, so Home Assistant needs to be restarted. The configuration is checked before restarting."
           }
         },
         "abort": {
@@ -41,22 +25,8 @@
         }
       }
     },
-    "include_missing": {
-      "title": "ha-artnet-led 0.x (artnet_led) configuration is not included",
-      "fix_flow": {
-        "step": {
-          "confirm": {
-            "title": "Include the generated file",
-            "description": "`{include_file}` is not referenced in `configuration.yaml`, so Home Assistant will not load it. Submit to append the following line:\n\n`{include_line}`"
-          }
-        },
-        "abort": {
-          "not_loaded": "The integration is not loaded."
-        }
-      }
-    },
     "dmx_include_missing": {
-      "title": "ha-artnet-led 1.x (dmx) configuration is not included",
+      "title": "DMX configuration is not included",
       "fix_flow": {
         "step": {
           "confirm": {

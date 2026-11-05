@@ -1,13 +1,11 @@
-"""Check the generated `dmx:` YAML against ha-artnet-led 1.x itself.
+"""Check the generated `dmx:` YAML against DMX itself.
 
 Usage: python scripts/check_dmx_schema.py <path to a Breina/ha-artnet-led checkout>
 
 1. Every validation case without errors is rendered and validated with the
    integration's CONFIG_SCHEMA.
-2. A migrated legacy configuration is validated the same way, and every
-   fixture/mode it references must be selectable with ha-artnet-led's parser.
-3. The channel count we compute for each bundled/test fixture mode must match
-   the number of channels ha-artnet-led's parser yields for that mode.
+2. The channel count we compute for each bundled/test fixture mode must match
+   the number of channels DMX's parser yields for that mode.
 """
 
 from __future__ import annotations
@@ -22,51 +20,6 @@ from typing import Any
 import yaml
 
 REPO = Path(__file__).resolve().parent.parent
-LEGACY_EXAMPLE: dict[str, Any] = {
-    "nodes": [
-        {
-            "host": "10.0.0.2",
-            "max_fps": 60,
-            "refresh_every": 120,
-            "universes": [
-                {
-                    "id": 1,
-                    "output_correction": "quadruple",
-                    "devices": [
-                        {
-                            "channel": 1,
-                            "name": "Küche Spot",
-                            "type": "dimmer",
-                            "channel_size": "16bit",
-                        },
-                        {"channel": 3, "name": "Strip", "type": "rgbww"},
-                        {
-                            "channel": 10,
-                            "name": "Warm",
-                            "type": "color_temp",
-                            "channel_setup": "hc",
-                        },
-                        {"channel": 12, "name": "Cold", "type": "color_temp"},
-                        {
-                            "channel": 14,
-                            "name": "Tunable",
-                            "type": "color_temp",
-                            "channel_setup": "dt",
-                        },
-                        {"channel": 30, "name": "Wash", "type": "rgb", "channel_setup": "drgb"},
-                        {"channel": 40, "name": "Relay", "type": "binary"},
-                        {"channel": 41, "name": "Bar", "type": "rgb", "channel_size": "16bit"},
-                    ],
-                }
-            ],
-        },
-        {
-            "host": "10.0.0.3",
-            "node_type": "sacn",
-            "universes": [{"id": 2, "devices": [{"channel": 1, "name": "S", "type": "rgbw"}]}],
-        },
-    ]
-}
 
 
 def _load_breina(breina: Path) -> tuple[Any, Any]:
@@ -94,17 +47,9 @@ def main(breina: Path) -> int:
     from custom_components.dmx_config_ui.files import render_dmx_yaml
     from custom_components.dmx_config_ui.fixtures import (
         BUNDLED_DIR,
-        find_fixture,
         load_fixture_dir,
     )
-    from custom_components.dmx_config_ui.migrate import migrate
-    from custom_components.dmx_config_ui.model import (
-        normalize_config as normalize_legacy,
-    )
-    from custom_components.dmx_config_ui.model_dmx import (
-        iter_universes,
-        normalize_config,
-    )
+    from custom_components.dmx_config_ui.model_dmx import normalize_config
 
     failures: list[str] = []
 
@@ -123,27 +68,6 @@ def main(breina: Path) -> int:
 
     bundled, errors = load_fixture_dir(BUNDLED_DIR, "bundled")
     failures += [f"bundled fixture: {error}" for error in errors]
-    migrated = migrate(normalize_legacy(LEGACY_EXAMPLE), bundled)["config"]
-    check_schema("migrated legacy example", migrated)
-
-    parsed: dict[str, Any] = {}
-    for fixture in bundled:
-        parsed[fixture["key"]] = parse(str(BUNDLED_DIR / fixture["file"]))
-    for _, _, universe in iter_universes(migrated):
-        for device in universe["devices"]:
-            summary = find_fixture(bundled, device["fixture"])
-            if summary is None:
-                failures.append(f"migration: unknown fixture {device['fixture']}")
-                continue
-            model = parsed[summary["key"]]
-            mode = device.get("mode") or next(iter(model.modes))
-            try:
-                model.select_mode(mode)
-            except Exception as err:
-                failures.append(f"migration: {device['name']}: {err}")
-            else:
-                print(f"ok   migration: {device['name']} -> {device['fixture']} / {mode}")
-
     test_fixtures, errors = load_fixture_dir(REPO / "tests/fixtures/ofl", "test")
     failures += [f"test fixture: {error}" for error in errors]
     for fixture, folder in [(f, BUNDLED_DIR) for f in bundled] + [

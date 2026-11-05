@@ -34,7 +34,7 @@ jobs:
         with:
           repository: Breina/ha-artnet-led
           ref: platform-refactor2
-          path: _ha-artnet-led-beta
+          path: _dmx
       - uses: actions/setup-python@v5
         with:
           python-version: "3.14"
@@ -42,4 +42,4 @@ jobs:
           cache-dependency-path: requirements_test.txt
       - run: pip install -r requirements_test.txt
       - name: Validate generated DMX YAML and fixture channel widths
-        run: python -m scripts.check_dmx_schema _ha-artnet-led-beta
+        run: python -m scripts.check_dmx_schema _dmx

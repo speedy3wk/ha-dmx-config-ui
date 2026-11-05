@@ -1,5 +1,4 @@
-/** Helpers for ha-artnet-led 1.x (`dmx:`) configurations, mirroring model_dmx.py / fixtures.py. */
-import type { Occupant } from "./model";
+/** Helpers for `dmx:` configurations, mirroring model_dmx.py / fixtures.py. */
 import type {
   ArtnetUniverse,
   DmxConfig,
@@ -21,7 +20,14 @@ export const PREFIX_PATTERN = /^[a-z0-9_]+$/;
 export const PROTOCOLS: DmxProtocol[] = ["artnet", "sacn"];
 export const ARTNET_DEFAULT_PORT = 6454;
 export const SACN_DEFAULT_PORT = 5568;
-/** Defaults of ha-artnet-led 1.x (setup/config_processor.py), shown as placeholders. */
+
+export interface Occupant {
+  index: number;
+  name: string;
+  start: number;
+  end: number;
+}
+/** Defaults of DMX (setup/config_processor.py), shown as placeholders. */
 export const DMX_DEFAULTS = {
   max_fps: 30,
   refresh_every: 0.8,

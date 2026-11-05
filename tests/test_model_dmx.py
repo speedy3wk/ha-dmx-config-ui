@@ -1,4 +1,4 @@
-"""Tests for the ha-artnet-led 1.x (`dmx:`) model."""
+"""Tests for the `dmx:` model."""
 
 from __future__ import annotations
 
@@ -6,7 +6,7 @@ import pytest
 import yaml
 
 from custom_components.dmx_config_ui.files import render_dmx_yaml
-from custom_components.dmx_config_ui.model import ConfigFormatError
+from custom_components.dmx_config_ui.model_common import ConfigFormatError
 from custom_components.dmx_config_ui.model_dmx import (
     device_width,
     empty_config,

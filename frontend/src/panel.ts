@@ -7,43 +7,32 @@ import {
   fetchFixtures,
   fetchStatus,
   importExisting,
-  migrateLegacy,
   previewConfig,
-  saveConfig,
-  type AnyConfig
+  saveConfig
 } from "./api";
 import "./components/dialog";
 import "./components/dmx-editor";
-import "./components/editor";
 import "./components/fixture-library";
-import "./components/migrate-dialog";
 import { issueText, languageOf, translator, type TextKey, type Translate } from "./i18n";
-import { ImportError, configFromJson, configFromYaml } from "./import";
-import { dmxHasContent, isDmxConfig, normalizeDmxConfig } from "./model_dmx";
-import { exampleConfig, exampleDmxConfig } from "./sample";
+import { IssueIndex } from "./issue-index";
+import { dmxHasContent, normalizeDmxConfig } from "./model_dmx";
+import { exampleDmxConfig } from "./sample";
 import type {
   DeployResult,
   HomeAssistant,
   PreviewResult,
   StatusResult,
-  Target,
-  UiConfig,
   ValidationIssue
 } from "./types";
-import { emptyConfig } from "./types";
-import { emptyDmxConfig, type DmxConfig, type FixturesResult, type MigrationResult } from "./types_dmx";
+import { emptyDmxConfig, type DmxConfig, type FixturesResult } from "./types_dmx";
 import { haElement, safeDefine } from "./utils/define";
-import { newNode } from "./utils/mutate";
 import { alert, icon, sharedStyles } from "./utils/ui";
-import { IssueIndex, validateConfig } from "./validation";
 import { errorsOnly, validateDmxConfig } from "./validation_dmx";
 
 declare const __VERSION__: string;
 export const FRONTEND_VERSION = __VERSION__;
 
 const HISTORY_LIMIT = 100;
-const TARGET_STORAGE_KEY = "dmx_config_ui.target";
-const TARGETS: Target[] = ["dmx", "artnet_led"];
 
 interface ConfirmState {
   title: TextKey;
@@ -52,42 +41,26 @@ interface ConfirmState {
 }
 
 interface DeployState {
-  target: Target;
   preview?: PreviewResult;
   result?: DeployResult;
   error?: string;
   busy: boolean;
 }
 
-interface MigrateState {
-  result?: MigrationResult;
-  error?: string;
-}
-
-/** One editable document per backend, each with its own undo history. */
 interface Doc {
-  config?: AnyConfig;
+  config?: DmxConfig;
   saved: string;
   history: string[];
   future: string[];
 }
 
 const emptyDoc = (): Doc => ({ saved: "", history: [], future: [] });
-const loadedDoc = (config: AnyConfig): Doc => ({ config, saved: JSON.stringify(config), history: [], future: [] });
+const loadedDoc = (config: DmxConfig): Doc => ({ config, saved: JSON.stringify(config), history: [], future: [] });
 const isError = (issue: ValidationIssue) => (issue.severity ?? "error") === "error";
 
 const navigate = (path: string) => {
   history.pushState(null, "", path);
   window.dispatchEvent(new CustomEvent("location-changed", { detail: { replace: false } }));
-};
-
-const readStoredTarget = (): Target | undefined => {
-  try {
-    const value = window.localStorage.getItem(TARGET_STORAGE_KEY);
-    return value === "dmx" || value === "artnet_led" ? value : undefined;
-  } catch {
-    return undefined;
-  }
 };
 
 export class DmxConfigUiPanel extends LitElement {
@@ -97,8 +70,7 @@ export class DmxConfigUiPanel extends LitElement {
   /** Rendered inside a dashboard card: no app header. */
   @property({ type: Boolean, reflect: true }) public embedded = false;
 
-  @state() private _docs: Record<Target, Doc> = { artnet_led: emptyDoc(), dmx: emptyDoc() };
-  @state() private _target: Target = "artnet_led";
+  @state() private _doc: Doc = emptyDoc();
   @state() private _issues = new IssueIndex();
   @state() private _status?: StatusResult;
   @state() private _fixtures?: FixturesResult;
@@ -107,17 +79,12 @@ export class DmxConfigUiPanel extends LitElement {
   @state() private _toast?: { type: "success" | "error" | "info"; text: string };
   @state() private _menuOpen = false;
   @state() private _confirm?: ConfirmState;
-  @state() private _importOpen = false;
-  @state() private _importText = "";
-  @state() private _importError?: string;
   @state() private _deploy?: DeployState;
-  @state() private _migrate?: MigrateState;
   @state() private _libraryOpen = false;
 
   @query("input[type=file]") private _fileInput?: HTMLInputElement;
 
   private _loadStarted = false;
-  private _targetChosen = false;
   private _fixturesFolder?: string;
   private _toastTimer?: number;
 
@@ -125,33 +92,20 @@ export class DmxConfigUiPanel extends LitElement {
     return translator(languageOf(this.hass));
   }
 
-  private get _doc(): Doc {
-    return this._docs[this._target];
-  }
-
-  private get _config(): AnyConfig | undefined {
+  private get _config(): DmxConfig | undefined {
     return this._doc.config;
   }
 
-  private get _legacy(): UiConfig | undefined {
-    return this._docs.artnet_led.config as UiConfig | undefined;
-  }
-
   private get _dmx(): DmxConfig | undefined {
-    return this._docs.dmx.config as DmxConfig | undefined;
-  }
-
-  private _isDirty(target: Target) {
-    const doc = this._docs[target];
-    return doc.config !== undefined && JSON.stringify(doc.config) !== doc.saved;
+    return this._doc.config;
   }
 
   private get _dirty() {
-    return this._isDirty(this._target);
+    return this._doc.config !== undefined && JSON.stringify(this._doc.config) !== this._doc.saved;
   }
 
   private get _modalOpen() {
-    return this._importOpen || Boolean(this._deploy || this._confirm || this._migrate) || this._libraryOpen;
+    return Boolean(this._deploy || this._confirm) || this._libraryOpen;
   }
 
   // ---------------------------------------------------------------- lifecycle
@@ -170,13 +124,11 @@ export class DmxConfigUiPanel extends LitElement {
   }
 
   protected willUpdate(changed: PropertyValues<this>) {
-    const keys = ["_docs", "_target", "_fixtures"];
+    const keys = ["_doc", "_fixtures"];
     if (keys.some((key) => (changed as Map<string, unknown>).has(key))) {
       const config = this._config;
       if (!config) this._issues = new IssueIndex();
-      else if (this._target === "dmx") {
-        this._issues = new IssueIndex(validateDmxConfig(config as DmxConfig, this._fixtures?.fixtures));
-      } else this._issues = new IssueIndex(validateConfig(config as UiConfig));
+      else this._issues = new IssueIndex(validateDmxConfig(config, this._fixtures?.fixtures));
     }
   }
 
@@ -186,14 +138,14 @@ export class DmxConfigUiPanel extends LitElement {
       void this._load();
     }
     const folder = this._dmx?.fixtures_folder;
-    if (this._target === "dmx" && folder !== undefined && folder !== this._fixturesFolder) {
+    if (folder !== undefined && folder !== this._fixturesFolder) {
       this._fixturesFolder = folder;
       void this._loadFixtures();
     }
   }
 
   private _onBeforeUnload = (ev: BeforeUnloadEvent) => {
-    if (this._isDirty("artnet_led") || this._isDirty("dmx")) ev.preventDefault();
+    if (this._dirty) ev.preventDefault();
   };
 
   private _onKeyDown = (ev: KeyboardEvent) => {
@@ -219,15 +171,16 @@ export class DmxConfigUiPanel extends LitElement {
 
   // -------------------------------------------------------------------- state
 
-  private _patchDoc(target: Target, patch: Partial<Doc>) {
-    this._docs = { ...this._docs, [target]: { ...this._docs[target], ...patch } };
+  private _patchDoc(patch: Partial<Doc>) {
+    this._doc = { ...this._doc, ...patch };
   }
 
-  private _setConfig(config: AnyConfig, target: Target = this._target) {
-    const doc = this._docs[target];
-    this._patchDoc(target, {
+  private _setConfig(config: DmxConfig) {
+    this._patchDoc({
       config,
-      history: doc.config ? [...doc.history, JSON.stringify(doc.config)].slice(-HISTORY_LIMIT) : doc.history,
+      history: this._doc.config
+        ? [...this._doc.history, JSON.stringify(this._doc.config)].slice(-HISTORY_LIMIT)
+        : this._doc.history,
       future: []
     });
   }
@@ -235,7 +188,7 @@ export class DmxConfigUiPanel extends LitElement {
   private _undo() {
     const doc = this._doc;
     if (!doc.history.length || !doc.config) return;
-    this._patchDoc(this._target, {
+    this._patchDoc({
       future: [JSON.stringify(doc.config), ...doc.future],
       config: JSON.parse(doc.history[doc.history.length - 1]),
       history: doc.history.slice(0, -1)
@@ -245,31 +198,11 @@ export class DmxConfigUiPanel extends LitElement {
   private _redo() {
     const doc = this._doc;
     if (!doc.future.length || !doc.config) return;
-    this._patchDoc(this._target, {
+    this._patchDoc({
       history: [...doc.history, JSON.stringify(doc.config)],
       config: JSON.parse(doc.future[0]),
       future: doc.future.slice(1)
     });
-  }
-
-  private _selectTarget(target: Target) {
-    this._target = target;
-    this._menuOpen = false;
-    try {
-      window.localStorage.setItem(TARGET_STORAGE_KEY, target);
-    } catch {
-      // storage is optional
-    }
-  }
-
-  private _initialTarget(status: StatusResult): Target {
-    const stored = readStoredTarget();
-    if (stored) return stored;
-    const backends = status.backends;
-    const legacyContent = Boolean(this._legacy?.nodes.length);
-    if (backends?.dmx.installed && !(backends.artnet_led.installed && legacyContent)) return "dmx";
-    if (!backends?.artnet_led.installed && dmxHasContent(this._dmx)) return "dmx";
-    return "artnet_led";
   }
 
   private _showToast(type: "success" | "error" | "info", text: string) {
@@ -283,8 +216,8 @@ export class DmxConfigUiPanel extends LitElement {
     else action();
   }
 
-  private _hasContent(target: Target = this._target) {
-    return target === "dmx" ? dmxHasContent(this._dmx) : Boolean(this._legacy?.nodes.length);
+  private _hasContent() {
+    return dmxHasContent(this._dmx);
   }
 
   // ------------------------------------------------------------------ backend
@@ -293,21 +226,13 @@ export class DmxConfigUiPanel extends LitElement {
     if (!this.hass) return;
     this._loadError = undefined;
     try {
-      const [legacy, dmx, status] = await Promise.all([
-        fetchConfig<UiConfig>(this.hass, "artnet_led"),
-        fetchConfig<DmxConfig>(this.hass, "dmx"),
+      const [dmx, status] = await Promise.all([
+        fetchConfig(this.hass),
         fetchStatus(this.hass)
       ]);
-      this._docs = {
-        artnet_led: loadedDoc(legacy ?? emptyConfig()),
-        dmx: loadedDoc(dmx ?? emptyDmxConfig())
-      };
+      this._doc = loadedDoc(dmx ?? emptyDmxConfig());
       this._status = status;
       this._fixturesFolder = undefined;
-      if (!this._targetChosen) {
-        this._targetChosen = true;
-        this._target = this._initialTarget(status);
-      }
     } catch (err) {
       this._loadError = errorMessage(err);
     }
@@ -333,16 +258,15 @@ export class DmxConfigUiPanel extends LitElement {
   }
 
   private async _save() {
-    const target = this._target;
     const config = this._config;
     if (!this.hass || !config || this._saving) return;
     this._saving = true;
     try {
-      const result = await saveConfig<AnyConfig>(this.hass, config, target);
+      const result = await saveConfig(this.hass, config);
       if (JSON.stringify(result.config) !== JSON.stringify(config)) {
-        this._patchDoc(target, { config: result.config });
+        this._patchDoc({ config: result.config });
       }
-      this._patchDoc(target, { saved: JSON.stringify(this._docs[target].config) });
+      this._patchDoc({ saved: JSON.stringify(this._doc.config) });
       this._showToast("success", this._t("saved"));
     } catch (err) {
       this._showToast("error", `${this._t("saveError")}: ${errorMessage(err)}`);
@@ -352,49 +276,30 @@ export class DmxConfigUiPanel extends LitElement {
   }
 
   private async _openDeploy() {
-    const target = this._target;
     const config = this._config;
     if (!this.hass || !config) return;
-    this._deploy = { target, busy: true };
+    this._deploy = { busy: true };
     try {
-      this._deploy = { target, busy: false, preview: await previewConfig(this.hass, config, target) };
+      this._deploy = { busy: false, preview: await previewConfig(this.hass, config) };
     } catch (err) {
-      this._deploy = { target, busy: false, error: errorMessage(err) };
+      this._deploy = { busy: false, error: errorMessage(err) };
     }
   }
 
   private async _runDeploy() {
     const deploy = this._deploy;
-    const config = deploy && this._docs[deploy.target].config;
+    const config = this._config;
     if (!this.hass || !deploy || !config) return;
     this._deploy = { ...deploy, busy: true, error: undefined };
     try {
-      const result = await deployConfig(this.hass, config, deploy.target);
-      if (result.status !== "invalid") this._patchDoc(deploy.target, { saved: JSON.stringify(config) });
+      const result = await deployConfig(this.hass, config);
+      if (result.status !== "invalid") this._patchDoc({ saved: JSON.stringify(config) });
       this._deploy = { ...deploy, busy: false, result };
       void this._refreshStatus();
-      if (deploy.target === "dmx" && result.installed_fixtures?.length) void this._loadFixtures();
+      if (result.installed_fixtures?.length) void this._loadFixtures();
     } catch (err) {
       this._deploy = { ...deploy, busy: false, error: errorMessage(err) };
     }
-  }
-
-  private async _openMigrate() {
-    if (!this.hass) return;
-    this._migrate = {};
-    try {
-      this._migrate = { result: await migrateLegacy(this.hass, this._legacy) };
-    } catch (err) {
-      this._migrate = { error: errorMessage(err) };
-    }
-  }
-
-  private _applyMigration() {
-    const result = this._migrate?.result;
-    this._migrate = undefined;
-    if (!result) return;
-    this._setConfig(result.config, "dmx");
-    this._selectTarget("dmx");
   }
 
   // ------------------------------------------------------------------ actions
@@ -404,50 +309,23 @@ export class DmxConfigUiPanel extends LitElement {
     action();
   }
 
-  private _replaceConfig(config: AnyConfig, target: Target) {
+  private _replaceConfig(config: DmxConfig) {
     this._confirmIf(
-      this._hasContent(target),
+      this._hasContent(),
       { title: "confirmImportTitle", text: "confirmImportText" },
-      () => {
-        this._setConfig(config, target);
-        this._selectTarget(target);
-      }
+      () => this._setConfig(config)
     );
-  }
-
-  private _importYaml() {
-    try {
-      const config = configFromYaml(this._importText);
-      this._importOpen = false;
-      this._importText = "";
-      this._importError = undefined;
-      this._replaceConfig(config, "artnet_led");
-    } catch (err) {
-      this._importError = this._t("importFailed", {
-        error: err instanceof ImportError ? err.message : errorMessage(err)
-      });
-    }
   }
 
   private async _importExisting() {
     if (!this.hass) return;
-    const target = this._target;
     try {
-      if (target === "dmx") {
-        const config = await importExisting<DmxConfig>(this.hass, "dmx");
-        if (!dmxHasContent(config)) {
-          this._showToast("info", this._t("importNothingDmx"));
-          return;
-        }
-        this._replaceConfig(config, "dmx");
+      const config = await importExisting(this.hass);
+      if (!dmxHasContent(config)) {
+        this._showToast("info", this._t("importNothingDmx"));
         return;
       }
-      const config = await importExisting<UiConfig>(this.hass, "artnet_led");
-      if (!config.nodes.length) {
-        this._showToast("info", this._t("importNothing"));
-        return;
-      }
-      this._replaceConfig(config, "artnet_led");
+      this._replaceConfig(config);
     } catch (err) {
       this._showToast("error", this._t("importFailed", { error: errorMessage(err) }));
     }
@@ -460,19 +338,7 @@ export class DmxConfigUiPanel extends LitElement {
     if (!file) return;
     try {
       const text = await file.text();
-      if (!file.name.endsWith(".json")) {
-        this._replaceConfig(configFromYaml(text), "artnet_led");
-        return;
-      }
-      let data: unknown;
-      try {
-        data = JSON.parse(text);
-      } catch (err) {
-        throw new ImportError((err as Error).message);
-      }
-      // Exported files of both formats are accepted; the matching tab is selected.
-      if (isDmxConfig(data)) this._replaceConfig(normalizeDmxConfig(data), "dmx");
-      else this._replaceConfig(configFromJson(text), "artnet_led");
+      this._replaceConfig(normalizeDmxConfig(JSON.parse(text)));
     } catch (err) {
       this._showToast("error", this._t("importFailed", { error: errorMessage(err) }));
     }
@@ -484,21 +350,18 @@ export class DmxConfigUiPanel extends LitElement {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = this._target === "dmx" ? "dmx-uiconfig.json" : "artnet-led-uiconfig.json";
+    link.download = "dmx-uiconfig.json";
     link.click();
     URL.revokeObjectURL(url);
   }
 
-  private _emptied(): AnyConfig {
-    if (this._target === "dmx") {
-      const config = this._dmx!;
-      return {
-        ...config,
-        artnet: { ...config.artnet, universes: [] },
-        sacn: { ...config.sacn, universes: [] }
-      };
-    }
-    return { ...this._legacy!, nodes: [] };
+  private _emptied(): DmxConfig {
+    const config = this._dmx!;
+    return {
+      ...config,
+      artnet: { ...config.artnet, universes: [] },
+      sacn: { ...config.sacn, universes: [] }
+    };
   }
 
   // ------------------------------------------------------------------- render
@@ -518,57 +381,30 @@ export class DmxConfigUiPanel extends LitElement {
       );
     }
     if (!status) return banners;
-    const backends = status.backends;
-    if (this._target === "artnet_led") {
-      // Without 0.x but with 1.x installed the tab badge is enough.
-      if (!status.artnet_led_installed && !backends?.dmx.installed) {
-        banners.push(alert("warning", t("artnetMissing")));
-      }
-      if (!status.included && (status.file_exists || this._hasContent("artnet_led"))) {
-        banners.push(
-          alert(
-            "warning",
-            html`${t("includeMissing", { path: status.path })}
-              <pre class="include">${status.include_key}: !include ${status.path}</pre>
-              ${this._openRepairsButton()}`
-          )
-        );
-      }
-    } else {
-      const dmx = status.dmx;
-      if (backends && !backends.dmx.installed) banners.push(alert("warning", t("dmxMissing")));
-      if (dmx && !dmx.included && (dmx.file_exists || this._hasContent("dmx"))) {
-        banners.push(
-          alert(
-            "warning",
-            html`${t("includeMissing", { path: dmx.path })}
-              <pre class="include">dmx: !include ${dmx.path}</pre>
-              ${dmx.foreign_block ? html`<p>${t("dmxForeignBlock")}</p>` : nothing}
-              ${this._openRepairsButton()}`
-          )
-        );
-      }
-      if (backends?.dmx.installed && this._hasContent("artnet_led") && !this._hasContent("dmx")) {
-        banners.push(
-          alert(
-            "info",
-            html`${t("dmxSuggestMigrate")}
-              <button class="inline" @click=${this._openMigrate}>${t("migrateFrom0x")}</button>`
-          )
-        );
-      }
-      const fixtureErrors = this._fixtures?.errors ?? [];
-      if (fixtureErrors.length) {
-        banners.push(
-          alert(
-            "warning",
-            html`${t("dmxFixtureErrors")}
-              <ul class="issues">
-                ${fixtureErrors.map((e) => html`<li><code>${e.file}</code>: ${e.error}</li>`)}
-              </ul>`
-          )
-        );
-      }
+    const dmx = status.dmx;
+    if (!status.backends.dmx.installed) banners.push(alert("warning", t("dmxMissing")));
+    if (!dmx.included && (dmx.file_exists || this._hasContent())) {
+      banners.push(
+        alert(
+          "warning",
+          html`${t("includeMissing", { path: dmx.path })}
+            <pre class="include">dmx: !include ${dmx.path}</pre>
+            ${dmx.foreign_block ? html`<p>${t("dmxForeignBlock")}</p>` : nothing}
+            ${this._openRepairsButton()}`
+        )
+      );
+    }
+    const fixtureErrors = this._fixtures?.errors ?? [];
+    if (fixtureErrors.length) {
+      banners.push(
+        alert(
+          "warning",
+          html`${t("dmxFixtureErrors")}
+            <ul class="issues">
+              ${fixtureErrors.map((e) => html`<li><code>${e.file}</code>: ${e.error}</li>`)}
+            </ul>`
+        )
+      );
     }
     if (status.restart_required) {
       banners.push(
@@ -578,64 +414,23 @@ export class DmxConfigUiPanel extends LitElement {
     return banners;
   }
 
-  private _renderTabs() {
-    const t = this._t;
-    const backends = this._status?.backends;
-    return html`
-      <div class="tabs" role="tablist">
-        ${TARGETS.map((target) => {
-          const info = backends?.[target];
-          const active = target === this._target;
-          return html`
-            <button
-              role="tab"
-              class="tab ${active ? "active" : ""}"
-              aria-selected=${active}
-              @click=${() => this._selectTarget(target)}
-            >
-              <span class="tab-title">
-                ${icon(target === "dmx" ? "mdi:spotlight-beam" : "mdi:lightbulb")}
-                ${t(target === "dmx" ? "tabDmx" : "tabLegacy")}
-                ${this._isDirty(target) ? html`<span class="dot" title=${t("unsaved")}></span>` : nothing}
-              </span>
-              <span class="tab-sub">${t(target === "dmx" ? "tabDmxSub" : "tabLegacySub")}</span>
-              ${info
-                ? html`<span class="badge ${info.installed ? "ok" : "missing"}">
-                    ${info.installed
-                      ? t("backendInstalled", {
-                          version: target === "dmx" || !info.version ? "" : `v${info.version}`
-                        }).trim()
-                      : t("backendMissing")}
-                  </span>`
-                : nothing}
-            </button>
-          `;
-        })}
-      </div>
-    `;
-  }
-
   private _renderMenu() {
     const t = this._t;
-    const dmx = this._target === "dmx";
     const item = (label: string, action: () => void, options: { danger?: boolean; disabled?: boolean } = {}) =>
       html`<button role="menuitem" class=${options.danger ? "danger" : ""} ?disabled=${options.disabled} @click=${() =>
         this._menuAction(action)}>${label}</button>`;
     return html`
       <div class="menu-backdrop" @click=${() => (this._menuOpen = false)}></div>
       <div class="menu" role="menu">
-        ${dmx
-          ? html`${item(t("migrateFrom0x"), () => void this._openMigrate(), { disabled: !this._hasContent("artnet_led") })}
-              ${item(t("dmxLibrary"), () => (this._libraryOpen = true))}
-              <hr />`
-          : item(t("importYaml"), () => (this._importOpen = true))}
+        ${item(t("dmxLibrary"), () => (this._libraryOpen = true))}
+        <hr />
         ${item(t("importExisting"), () => void this._importExisting())}
         ${item(t("importJson"), () => this._fileInput?.click())}
         ${item(t("exportJson"), () => this._exportJson())}
         <hr />
         ${item(t("loadExample"), () =>
           this._confirmIf(this._hasContent(), { title: "confirmExampleTitle", text: "confirmExampleText" }, () =>
-            this._setConfig(dmx ? exampleDmxConfig() : exampleConfig())
+            this._setConfig(exampleDmxConfig())
           )
         )}
         ${item(
@@ -648,7 +443,7 @@ export class DmxConfigUiPanel extends LitElement {
         )}
         ${item(t("reload"), () =>
           this._confirmIf(
-            this._isDirty("artnet_led") || this._isDirty("dmx"),
+            this._dirty,
             { title: "confirmReloadTitle", text: "confirmReloadText" },
             () => void this._load()
           )
@@ -671,11 +466,7 @@ export class DmxConfigUiPanel extends LitElement {
         <button class="icon" title="${t("redo")} (Ctrl+Shift+Z)" aria-label=${t("redo")} ?disabled=${!doc.future.length} @click=${this._redo}>
           ${icon("mdi:redo")}
         </button>
-        ${this._target === "dmx"
-          ? html`<button @click=${() => (this._libraryOpen = true)}>${icon("mdi:bookshelf")} ${t("dmxLibrary")}</button>`
-          : html`<button @click=${() => this._setConfig({ ...this._legacy!, nodes: [...this._legacy!.nodes, newNode()] })}>
-              ${icon("mdi:plus")} ${t("addNode")}
-            </button>`}
+        <button @click=${() => (this._libraryOpen = true)}>${icon("mdi:bookshelf")} ${t("dmxLibrary")}</button>
         <div class="menu-wrap">
           <button aria-haspopup="menu" aria-expanded=${this._menuOpen} @click=${() => (this._menuOpen = !this._menuOpen)}>
             ${icon("mdi:dots-vertical")} ${t("more")}
@@ -684,7 +475,7 @@ export class DmxConfigUiPanel extends LitElement {
         </div>
         <input
           type="file"
-          accept=${this._target === "dmx" ? ".json,application/json" : ".json,.yaml,.yml,application/json"}
+          accept=".json,application/json"
           hidden
           @change=${this._importFile}
         />
@@ -792,33 +583,6 @@ export class DmxConfigUiPanel extends LitElement {
     `;
   }
 
-  private _renderImportDialog() {
-    if (!this._importOpen) return nothing;
-    const t = this._t;
-    return html`
-      <artnetui-dialog
-        open
-        .heading=${t("importYamlTitle")}
-        .subtitle=${t("importYamlSubtitle")}
-        .closeLabel=${t("close")}
-        @closed=${() => (this._importOpen = false)}
-      >
-        <textarea
-          rows="14"
-          spellcheck="false"
-          placeholder="light:\n  - platform: artnet_led\n    host: 192.168.0.10\n    universes: ..."
-          .value=${this._importText}
-          @input=${(ev: Event) => (this._importText = (ev.target as HTMLTextAreaElement).value)}
-        ></textarea>
-        ${this._importError ? alert("error", this._importError) : nothing}
-        <button slot="actions" @click=${() => (this._importOpen = false)}>${t("cancel")}</button>
-        <button slot="actions" class="primary" ?disabled=${!this._importText.trim()} @click=${this._importYaml}>
-          ${t("importAction")}
-        </button>
-      </artnetui-dialog>
-    `;
-  }
-
   private _renderConfirmDialog() {
     const confirm = this._confirm;
     if (!confirm) return nothing;
@@ -832,21 +596,6 @@ export class DmxConfigUiPanel extends LitElement {
           confirm.action();
         }}>${t("confirm")}</button>
       </artnetui-dialog>
-    `;
-  }
-
-  private _renderMigrateDialog() {
-    const migrate = this._migrate;
-    if (!migrate) return nothing;
-    return html`
-      <artnetui-migrate-dialog
-        .t=${this._t}
-        .result=${migrate.result}
-        .error=${migrate.error}
-        ?replacing=${this._hasContent("dmx")}
-        @apply=${this._applyMigration}
-        @closed=${() => (this._migrate = undefined)}
-      ></artnetui-migrate-dialog>
     `;
   }
 
@@ -877,26 +626,15 @@ export class DmxConfigUiPanel extends LitElement {
   }
 
   private _renderEditor() {
-    const t = this._t;
-    if (this._target === "dmx") {
-      return html`
-        <artnetui-dmx-editor
-          .config=${this._dmx!}
-          .fixtures=${this._fixtures?.fixtures}
-          .issues=${this._issues}
-          .t=${t}
-          @config-changed=${(ev: CustomEvent<{ config: DmxConfig }>) => this._setConfig(ev.detail.config, "dmx")}
-          @open-library=${() => (this._libraryOpen = true)}
-        ></artnetui-dmx-editor>
-      `;
-    }
     return html`
-      <artnetui-editor
-        .config=${this._legacy!}
+      <artnetui-dmx-editor
+        .config=${this._dmx!}
+        .fixtures=${this._fixtures?.fixtures}
         .issues=${this._issues}
-        .t=${t}
-        @config-changed=${(ev: CustomEvent<{ config: UiConfig }>) => this._setConfig(ev.detail.config, "artnet_led")}
-      ></artnetui-editor>
+        .t=${this._t}
+        @config-changed=${(ev: CustomEvent<{ config: DmxConfig }>) => this._setConfig(ev.detail.config)}
+        @open-library=${() => (this._libraryOpen = true)}
+      ></artnetui-dmx-editor>
     `;
   }
 
@@ -909,13 +647,12 @@ export class DmxConfigUiPanel extends LitElement {
     } else if (!this._config) {
       content = html`<p class="muted">${t("loading")}</p>`;
     } else {
-      content = html`${this._renderTabs()} ${this._renderBanners()} ${this._renderToolbar()} ${this._renderEditor()}`;
+      content = html`${this._renderBanners()} ${this._renderToolbar()} ${this._renderEditor()}`;
     }
     return html`
       ${this._renderHeader()}
       <div class="content">${content}</div>
-      ${this._renderDeployDialog()} ${this._renderImportDialog()} ${this._renderMigrateDialog()}
-      ${this._renderLibrary()} ${this._renderConfirmDialog()}
+      ${this._renderDeployDialog()} ${this._renderLibrary()} ${this._renderConfirmDialog()}
     `;
   }
 

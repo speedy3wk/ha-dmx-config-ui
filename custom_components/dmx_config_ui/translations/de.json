@@ -3,27 +3,11 @@
     "step": {
       "user": {
         "title": "DMX Config UI",
-        "description": "Fügt das Panel **DMX Config** zur Seitenleiste hinzu. Das Panel schreibt die YAML-Konfiguration für [ha-artnet-led]({artnet_led_url}) – sowohl für 0.x (`artnet_led`) als auch für 1.x (`dmx`)."
+        "description": "Fügt das Panel **DMX Config** zur Seitenleiste hinzu. Das Panel schreibt die YAML-Konfiguration für [DMX]({dmx_url})."
       }
     },
     "abort": {
       "single_instance_allowed": "Bereits konfiguriert. Nur eine einzige Konfiguration möglich."
-    }
-  },
-  "options": {
-    "step": {
-      "init": {
-        "title": "DMX Config UI",
-        "data": {
-          "include_file": "Include-Datei"
-        },
-        "data_description": {
-          "include_file": "Datei im Konfigurationsverzeichnis, in die die generierten `artnet_led`-Plattformen geschrieben werden, z. B. `dmx_config_ui.yaml`."
-        }
-      }
-    },
-    "error": {
-      "invalid_include_file": "Relativen Pfad mit Endung .yaml oder .yml innerhalb des Konfigurationsverzeichnisses angeben (nicht configuration.yaml)."
     }
   },
   "issues": {
@@ -33,7 +17,7 @@
         "step": {
           "confirm": {
             "title": "Home Assistant neu starten",
-            "description": "`{include_file}` wurde aktualisiert. ha-artnet-led liest seine Konfiguration nur beim Start, daher muss Home Assistant neu gestartet werden. Die Konfiguration wird vor dem Neustart geprüft."
+            "description": "`{include_file}` wurde aktualisiert. DMX liest seine Konfiguration nur beim Start, daher muss Home Assistant neu gestartet werden. Die Konfiguration wird vor dem Neustart geprüft."
           }
         },
         "abort": {
@@ -41,22 +25,8 @@
         }
       }
     },
-    "include_missing": {
-      "title": "ha-artnet-led-0.x-Konfiguration (artnet_led) wird nicht eingebunden",
-      "fix_flow": {
-        "step": {
-          "confirm": {
-            "title": "Generierte Datei einbinden",
-            "description": "`{include_file}` wird in der `configuration.yaml` nicht referenziert und daher nicht geladen. Absenden hängt folgende Zeile an:\n\n`{include_line}`"
-          }
-        },
-        "abort": {
-          "not_loaded": "Die Integration ist nicht geladen."
-        }
-      }
-    },
     "dmx_include_missing": {
-      "title": "ha-artnet-led-1.x-Konfiguration (dmx) wird nicht eingebunden",
+      "title": "DMX-Konfiguration wird nicht eingebunden",
       "fix_flow": {
         "step": {
           "confirm": {

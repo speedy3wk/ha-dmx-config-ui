@@ -1,4 +1,4 @@
-"""Business logic for the ha-artnet-led 1.x (`dmx`) target."""
+"""Business logic for the `dmx` target."""
 
 from __future__ import annotations
 
@@ -42,8 +42,7 @@ from .fixtures import (
     parse_fixture_text,
     safe_file_name,
 )
-from .migrate import migrate
-from .model import ConfigFormatError, normalize_config as normalize_artnet
+from .model_common import ConfigFormatError
 from .model_dmx import (
     DEFAULT_FOLDER,
     empty_config,
@@ -265,15 +264,6 @@ class DmxManager:
         """Read the current `dmx:` configuration (resolving includes) into a UI config."""
         hass_config = await conf_util.async_hass_config_yaml(self.hass)
         return from_yaml(hass_config.get(DMX_DOMAIN))
-
-    async def async_migrate(self, raw_artnet: Any | None = None) -> dict[str, Any]:
-        artnet = (
-            normalize_artnet(raw_artnet)
-            if raw_artnet is not None
-            else await self.parent.async_get_config()
-        )
-        fixtures = (await self.async_fixtures())["fixtures"]
-        return migrate(artnet, fixtures)
 
     # ------------------------------------------------------------------ issues
 

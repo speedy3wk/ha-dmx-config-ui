@@ -1,20 +1,13 @@
-"""Config and options flow for DMX Config UI."""
+"""Config flow for DMX Config UI."""
 
 from __future__ import annotations
 
 from typing import Any
 
-from homeassistant.config_entries import (
-    ConfigEntry,
-    ConfigFlow,
-    ConfigFlowResult,
-    OptionsFlowWithReload,
-)
-from homeassistant.core import callback
+from homeassistant.config_entries import ConfigFlow, ConfigFlowResult
 import voluptuous as vol
 
-from .const import ARTNET_LED_URL, CONF_INCLUDE_FILE, DEFAULT_INCLUDE_FILE, DOMAIN
-from .files import is_valid_include_file
+from .const import DMX_URL, DOMAIN
 
 
 class DmxConfigUiConfigFlow(ConfigFlow, domain=DOMAIN):
@@ -27,30 +20,6 @@ class DmxConfigUiConfigFlow(ConfigFlow, domain=DOMAIN):
             return self.async_show_form(
                 step_id="user",
                 data_schema=vol.Schema({}),
-                description_placeholders={"artnet_led_url": ARTNET_LED_URL},
+                description_placeholders={"dmx_url": DMX_URL},
             )
         return self.async_create_entry(title="DMX Config UI", data={})
-
-    @staticmethod
-    @callback
-    def async_get_options_flow(config_entry: ConfigEntry) -> OptionsFlowHandler:
-        return OptionsFlowHandler()
-
-
-class OptionsFlowHandler(OptionsFlowWithReload):
-    """Configure the target include file."""
-
-    async def async_step_init(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
-        errors: dict[str, str] = {}
-        if user_input is not None:
-            include_file = user_input[CONF_INCLUDE_FILE].strip()
-            if is_valid_include_file(include_file):
-                return self.async_create_entry(data={CONF_INCLUDE_FILE: include_file})
-            errors[CONF_INCLUDE_FILE] = "invalid_include_file"
-
-        current = self.config_entry.options.get(CONF_INCLUDE_FILE, DEFAULT_INCLUDE_FILE)
-        return self.async_show_form(
-            step_id="init",
-            data_schema=vol.Schema({vol.Required(CONF_INCLUDE_FILE, default=current): str}),
-            errors=errors,
-        )

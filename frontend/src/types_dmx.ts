@@ -1,4 +1,4 @@
-/** Types for ha-artnet-led 1.x (`dmx:`) configurations, mirroring model_dmx.py. */
+/** Types for `dmx:` configurations, mirroring model_dmx.py. */
 
 export interface DmxHost {
   host: string;
@@ -120,18 +120,6 @@ export interface OflSearchResult {
   name: string;
   manufacturer: string;
   fixture: string;
-}
-
-export interface MigrationWarning {
-  code: string;
-  device: string | null;
-  params: Record<string, string | number | null | unknown>;
-}
-
-export interface MigrationResult {
-  config: DmxConfig;
-  warnings: MigrationWarning[];
-  fixtures: string[];
 }
 
 export const emptyDmxConfig = (): DmxConfig => ({

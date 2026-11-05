@@ -15,7 +15,7 @@ import type { Path, ValidationIssue } from "../types";
 import type { DmxConfig, DmxDevice, DmxProtocol, FixtureMode, FixtureSummary } from "../types_dmx";
 import { safeDefine } from "../utils/define";
 import { icon, numberField, selectField, sharedStyles, textField } from "../utils/ui";
-import { IssueIndex } from "../validation";
+import { IssueIndex } from "../issue-index";
 import { validateDmxConfig } from "../validation_dmx";
 import "./dialog";
 

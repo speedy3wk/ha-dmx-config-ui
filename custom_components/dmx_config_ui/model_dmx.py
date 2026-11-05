@@ -1,7 +1,7 @@
-"""Data model, validation and conversion for ha-artnet-led 1.x (`dmx:`) configurations.
+"""Data model, validation and conversion for `dmx:` configurations.
 
 The rules mirror CONFIG_SCHEMA in custom_components/dmx/setup/config_processor.py of
-https://github.com/Breina/ha-artnet-led (branch platform-refactor2).
+https://github.com/Breina/ha-artnet-led.
 This module is intentionally free of Home Assistant imports so it can be unit tested.
 """
 
@@ -12,7 +12,7 @@ import re
 from typing import Any
 
 from .fixtures import find_fixture, find_mode
-from .model import (
+from .model_common import (
     ConfigFormatError,
     _as_dict,
     _as_list,
@@ -379,7 +379,7 @@ def _validate_device(
 def validate_config(
     config: Mapping[str, Any], fixtures: list[Mapping[str, Any]] | None = None
 ) -> list[dict[str, Any]]:
-    """Return problems that would make ha-artnet-led 1.x reject or misbehave on the config.
+    """Return problems that would make DMX reject or misbehave on the config.
 
     `fixtures` is the list of fixture summaries (see fixtures.py). If omitted,
     fixture/mode/footprint checks are skipped.

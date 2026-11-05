@@ -2,46 +2,34 @@ import type {
   DeployResult,
   HomeAssistant,
   PreviewResult,
-  StatusResult,
-  Target,
-  UiConfig
+  StatusResult
 } from "./types";
 import type {
   DmxConfig,
   FixtureSummary,
   FixturesResult,
-  MigrationResult,
   OflSearchResult
 } from "./types_dmx";
 
 const DOMAIN = "dmx_config_ui";
 
-export type AnyConfig = UiConfig | DmxConfig;
+export const fetchConfig = (hass: HomeAssistant) =>
+  hass.callWS<DmxConfig>({ type: `${DOMAIN}/get` });
 
-export const fetchConfig = <T extends AnyConfig = UiConfig>(
-  hass: HomeAssistant,
-  target: Target = "artnet_led"
-) => hass.callWS<T>({ type: `${DOMAIN}/get`, target });
+export const saveConfig = (hass: HomeAssistant, config: DmxConfig) =>
+  hass.callWS<{ status: string; config: DmxConfig }>({ type: `${DOMAIN}/save`, config });
 
-export const saveConfig = <T extends AnyConfig = UiConfig>(
-  hass: HomeAssistant,
-  config: T,
-  target: Target = "artnet_led"
-) => hass.callWS<{ status: string; config: T }>({ type: `${DOMAIN}/save`, config, target });
+export const previewConfig = (hass: HomeAssistant, config: DmxConfig) =>
+  hass.callWS<PreviewResult>({ type: `${DOMAIN}/preview`, config });
 
-export const previewConfig = (hass: HomeAssistant, config: AnyConfig, target: Target = "artnet_led") =>
-  hass.callWS<PreviewResult>({ type: `${DOMAIN}/preview`, config, target });
-
-export const deployConfig = (hass: HomeAssistant, config: AnyConfig, target: Target = "artnet_led") =>
-  hass.callWS<DeployResult>({ type: `${DOMAIN}/deploy`, config, target });
+export const deployConfig = (hass: HomeAssistant, config: DmxConfig) =>
+  hass.callWS<DeployResult>({ type: `${DOMAIN}/deploy`, config });
 
 export const fetchStatus = (hass: HomeAssistant) =>
   hass.callWS<StatusResult>({ type: `${DOMAIN}/status` });
 
-export const importExisting = <T extends AnyConfig = UiConfig>(
-  hass: HomeAssistant,
-  target: Target = "artnet_led"
-) => hass.callWS<T>({ type: `${DOMAIN}/import_existing`, target });
+export const importExisting = (hass: HomeAssistant) =>
+  hass.callWS<DmxConfig>({ type: `${DOMAIN}/import_existing` });
 
 export const fetchFixtures = (hass: HomeAssistant, config?: DmxConfig) =>
   hass.callWS<FixturesResult>({ type: `${DOMAIN}/fixtures`, ...(config ? { config } : {}) });
@@ -58,9 +46,6 @@ export const searchOfl = (hass: HomeAssistant, query: string) =>
 
 export const downloadOfl = (hass: HomeAssistant, key: string) =>
   hass.callWS<FixtureSummary>({ type: `${DOMAIN}/ofl/download`, key });
-
-export const migrateLegacy = (hass: HomeAssistant, config?: UiConfig) =>
-  hass.callWS<MigrationResult>({ type: `${DOMAIN}/migrate`, ...(config ? { config } : {}) });
 
 export const errorMessage = (err: unknown): string => {
   if (err && typeof err === "object" && "message" in err) {

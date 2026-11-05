@@ -152,7 +152,7 @@ async def test_deploy_with_include(
     status = (await client.receive_json())["result"]
     assert status["included"] and status["file_exists"] and status["restart_required"]
     assert status["artnet_led_installed"] is False
-    assert status["version"] == "0.3.0"
+    assert status["version"] == "0.3.1"
 
 
 async def test_deploy_reports_check_error(

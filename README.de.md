@@ -21,7 +21,23 @@ English: see [README.md](README.md).
 - Home Assistant 2026.1 oder neuer
 - [ha-artnet-led](https://github.com/Breina/ha-artnet-led) 0.x oder 1.x Beta installiert (eine Konfiguration kann auch vorbereitet werden, bevor das Ziel-Backend installiert ist)
 
-## Installation (HACS Custom Repository)
+## Installation
+
+### Marketplace (empfohlen, Home Assistant ab 2026.11)
+
+Seit Home Assistant 2026.11 ist HACS als [Marketplace](https://www.home-assistant.io/integrations/marketplace/) direkt in Home Assistant enthalten. Eine separate HACS-Installation ist nicht nötig. DMX Config UI wird als benutzerdefiniertes Repository installiert.
+
+1. Als Administrator **Einstellungen → Marketplace** öffnen und gegebenenfalls den Warnhinweis zu Community-Inhalten bestätigen.
+2. **Über Link hinzufügen** (**Add from link**) wählen, `https://github.com/speedy3wk/ha-dmx-config-ui` eingeben und **Hinzufügen** wählen. Falls dazu aufgefordert, GitHub verbinden. Wird ein Inhaltstyp abgefragt, **Integration** auswählen.
+3. **DMX Config UI** öffnen und **Installieren** wählen.
+4. Dem Einrichtungsdialog folgen. Öffnet er sich nicht, unter **Einstellungen → Geräte & Dienste → Integration hinzufügen** **DMX Config UI** hinzufügen. Home Assistant nur neu starten, wenn der Marketplace dazu auffordert.
+
+Bestehende HACS-Installationen werden beim Update auf Home Assistant 2026.11 automatisch migriert; installierte Integrationen und ihre Update-Entitäten bleiben erhalten. Nach Integrationsupdates ist weiterhin ein Neustart von Home Assistant nötig.
+
+### HACS (Home-Assistant-Versionen vor 2026.11)
+
+Für ältere unterstützte Home-Assistant-Versionen gelten die folgenden bisherigen HACS-Schritte.
+
 DMX Config UI ist noch nicht in der HACS-Standardliste enthalten. Wenn HACS bereits installiert ist, öffnet dieser Button das Repository in HACS. Bestätige dort das Hinzufügen:
 
 [![In HACS öffnen](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=speedy3wk&repository=ha-dmx-config-ui&category=integration)
@@ -33,7 +49,7 @@ Alternativ kannst du es manuell hinzufügen:
 3. **DMX Config UI** installieren und Home Assistant neu starten.
 4. Unter **Einstellungen → Geräte & Dienste → Integration hinzufügen** **DMX Config UI** hinzufügen.
 
-Danach erscheint das Panel **DMX Config UI** in der Seitenleiste. Nur Administratoren sehen es.
+Nach beiden Installationswegen erscheint das Panel **DMX Config UI** in der Seitenleiste. Nur Administratoren sehen es.
 
 ## ha-artnet-led 1.x (`dmx`) bearbeiten
 
@@ -80,7 +96,7 @@ Der Editor lässt sich auch als Karte einbetten.
 ## Migration von 0.1.x (Add-on)
 Ab Version 0.2.0 wird das Add-on bzw. die App nicht mehr benötigt. Die Integration schreibt die YAML-Datei selbst.
 1. Das Add-on **Art-Net LED UI Config** deinstallieren und sein Repository aus dem Add-on-Store entfernen.
-2. Die Integration über HACS aktualisieren und neu starten.
+2. Die Integration über **Einstellungen → Updates** (Marketplace ab Home Assistant 2026.11) oder HACS (ältere unterstützte Home-Assistant-Versionen) aktualisieren und neu starten.
 3. Die gespeicherte Konfiguration bleibt erhalten. Eine vorhandene Zeile `light: !include ha_artnet_led_uiconfig.yaml` funktioniert weiter und wird erkannt.
 4. Wenn du die Konfiguration bisher von Hand gepflegt hast: im Tab **Art-Net LED (0.x)** **⋮ → Aus configuration.yaml importieren** auswählen.
 
